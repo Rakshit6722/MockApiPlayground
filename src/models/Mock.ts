@@ -22,33 +22,13 @@ const MockSchema = new mongoose.Schema({
         type: Number,
         default: 200
     },
-    delay:{
-        type: Number,
-        default:0
-    },
-    error:{
-        type: Boolean,
-        default: false
-    },
     isArray:{
         type: Boolean,
         default: false
     },
-    filterEnabled:{
-        type: Boolean,
-        default: false
-    },
-    paginationEnabled:{
-        type: Boolean,
-        default: false,
-    },
     keyField:{
         type: String,
         default: 'id'
-    },
-    defaultLimit:{
-        type: Number,
-        default: 10
     }
 },{
     timestamps: true,

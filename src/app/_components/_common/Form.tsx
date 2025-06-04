@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Copy, ChevronDown, ChevronRight, Code, AlertCircle } from 'lucide-react';
+import { Copy, ChevronDown, ChevronRight, Code, AlertCircle, Info } from 'lucide-react';
 
 export type EndpointFormValues = {
     route: string;
     status: number;
     responseBody: string;
-    delay: number;
+    response: any;
     isArray: boolean;
-    error: boolean;
     keyField: string;
-    filterEnabled: boolean;
-    paginationEnabled: boolean;
 };
 
 export type EndpointFormProps = {
@@ -35,19 +32,15 @@ function Form({
     submitLabel = 'Create Endpoint',
     username = ''
 }: EndpointFormProps) {
-    // Form state
+    // Form state - simplified
     const [route, setRoute] = useState(initialValues.route || '');
     const [status, setStatus] = useState(initialValues.status || 200);
     const [responseBody, setResponseBody] = useState(
         initialValues.responseBody || '{\n  "message": "Success"\n}'
     );
-    const [delay, setDelay] = useState(initialValues.delay || 0);
     const [isArray, setIsArray] = useState(initialValues.isArray || false);
-    const [showAdvanced, setShowAdvanced] = useState(false);
-    const [error, setError] = useState(initialValues.error || false);
-    const [keyField, setKeyField] = useState(initialValues.keyField || '');
-    const [filterEnabled, setFilterEnabled] = useState(initialValues.filterEnabled || false);
-    const [paginationEnabled, setPaginationEnabled] = useState(initialValues.paginationEnabled || false);
+    const [keyField, setKeyField] = useState(initialValues.keyField || 'id');
+    const [showUsageGuide, setShowUsageGuide] = useState(false);
     
     // Validation state
     const [routeError, setRouteError] = useState('');
@@ -58,13 +51,8 @@ function Form({
         if (initialValues.route !== undefined) setRoute(initialValues.route);
         if (initialValues.status !== undefined) setStatus(initialValues.status);
         if (initialValues.responseBody !== undefined) setResponseBody(initialValues.responseBody);
-        if (initialValues.delay !== undefined) setDelay(initialValues.delay);
         if (initialValues.isArray !== undefined) setIsArray(initialValues.isArray);
-        if (initialValues.error !== undefined) setError(initialValues.error);
         if (initialValues.keyField !== undefined) setKeyField(initialValues.keyField);
-        if (initialValues.filterEnabled !== undefined) setFilterEnabled(initialValues.filterEnabled);
-        if (initialValues.paginationEnabled !== undefined) setPaginationEnabled(initialValues.paginationEnabled);
-
     }, [initialValues]);
 
     const validateForm = () => {
@@ -98,17 +86,16 @@ function Form({
                 return;
             }
             
-            // Submit form values
+            const parsedResponse = JSON.parse(isArray ? `[${responseBody}]` : responseBody);
+            
+            // Submit form values (simplified)
             onSubmit({
                 route,
                 status,
-                response: JSON.parse(responseBody),
-                delay,
+                responseBody,
+                response: parsedResponse,
                 isArray,
-                error,
-                keyField,
-                filterEnabled,
-                paginationEnabled
+                keyField
             });
         } catch (err) {
             console.error('Error submitting form:', err);
@@ -126,7 +113,7 @@ function Form({
         try {
             const parsed = JSON.parse(responseBody);
             setResponseBody(JSON.stringify(parsed, null, 2));
-            setJsonError(''); // Clear error if formatting succeeds
+            setJsonError(''); 
         } catch (err) {
             setJsonError('Invalid JSON format');
         }
@@ -136,14 +123,15 @@ function Form({
         <>
             {/* Content - scrollable */}
             <div className="p-5 space-y-5 overflow-y-auto overflow-x-hidden
-        [&::-webkit-scrollbar]:w-1.5
-        [&::-webkit-scrollbar]:h-1.5
-        [&::-webkit-scrollbar-track]:bg-gray-800/20
-        [&::-webkit-scrollbar-track]:rounded-full
-        [&::-webkit-scrollbar-thumb]:bg-gray-700
-        [&::-webkit-scrollbar-thumb]:rounded-full
-        [&::-webkit-scrollbar-thumb:hover]:bg-gray-600
-        scrollbar-thin scrollbar-track-gray-800/20 scrollbar-thumb-gray-700">
+                [&::-webkit-scrollbar]:w-1.5
+                [&::-webkit-scrollbar]:h-1.5
+                [&::-webkit-scrollbar-track]:bg-gray-800/20
+                [&::-webkit-scrollbar-track]:rounded-full
+                [&::-webkit-scrollbar-thumb]:bg-gray-700
+                [&::-webkit-scrollbar-thumb]:rounded-full
+                [&::-webkit-scrollbar-thumb:hover]:bg-gray-600
+                scrollbar-thin scrollbar-track-gray-800/20 scrollbar-thumb-gray-700">
+                
                 {/* Endpoint URL Builder */}
                 <div>
                     <label className="block text-sm text-gray-300 mb-2 font-medium">
@@ -169,35 +157,20 @@ function Form({
                                 <span>{routeError}</span>
                             </div>
                         )}
-                        <div className="mt-3 flex items-center justify-between text-xs">
-                            <div className="flex items-center">
-                                <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 rounded font-medium">GET</span>
-                                <span className="ml-2 text-gray-400">Status:</span>
-                                <select
-                                    value={status}
-                                    onChange={(e) => setStatus(parseInt(e.target.value))}
-                                    className={`ml-1 bg-transparent border-none outline-none ${getStatusColor(status)}`}
-                                >
-                                    {statusCodes.map(s => (
-                                        <option key={s.code} value={s.code} className="bg-gray-800 text-white">
-                                            {s.code} - {s.text}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div className="flex items-center gap-1 text-gray-400">
-                                <span>Delay:</span>
-                                <input
-                                    type="number"
-                                    value={delay}
-                                    onChange={(e) => setDelay(parseInt(e.target.value) || 0)}
-                                    min={0}
-                                    max={5000}
-                                    className="w-16 bg-gray-700/50 border border-gray-700 rounded px-1 py-0.5 text-center"
-                                />
-                                <span>ms</span>
-                            </div>
+                        <div className="mt-3 flex items-center text-xs">
+                            <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 rounded font-medium">GET</span>
+                            <span className="ml-2 text-gray-400">Status:</span>
+                            <select
+                                value={status}
+                                onChange={(e) => setStatus(parseInt(e.target.value))}
+                                className={`ml-1 bg-transparent border-none outline-none ${getStatusColor(status)}`}
+                            >
+                                {statusCodes.map(s => (
+                                    <option key={s.code} value={s.code} className="bg-gray-800 text-white">
+                                        {s.code} - {s.text}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -261,85 +234,126 @@ function Form({
                     )}
                 </div>
 
-                {/* Advanced Options Toggle */}
+                {/* Key Field Input */}
+                <div>
+                    <label className="block text-sm text-gray-300 mb-2 font-medium">
+                        Key Field
+                    </label>
+                    <div>
+                        <input
+                            type="text"
+                            value={keyField}
+                            onChange={(e) => setKeyField(e.target.value)}
+                            placeholder="id"
+                            className="w-full bg-gray-800/60 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        />
+                        <p className="mt-1 text-xs text-gray-500">
+                            Field name that will be used for filtering (e.g., <span className="font-mono text-gray-400">?{keyField || 'id'}=123</span>)
+                        </p>
+                    </div>
+                </div>
+
+                {/* Query Parameters Usage Guide */}
                 <button
-                    onClick={() => setShowAdvanced(!showAdvanced)}
+                    onClick={() => setShowUsageGuide(!showUsageGuide)}
                     className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-300"
                 >
-                    {showAdvanced ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                    <span>Advanced Options</span>
+                    {showUsageGuide ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                    <span>Query Parameters Usage Guide</span>
                 </button>
 
-                {/* Advanced Options Panel - No validation needed here */}
-                {showAdvanced && (
+                {showUsageGuide && (
                     <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
                         className="bg-gray-800/40 border border-gray-800 rounded-lg p-4"
                     >
-                        <div className="space-y-4">
-                            <div className="grid grid-cols-2 gap-3">
-                                <label className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        checked={error}
-                                        onChange={(e) => setError(e.target.checked)}
-                                        className="w-3 h-3 bg-gray-700 border-gray-600 rounded"
-                                    />
-                                    <span className="text-xs text-gray-300">Simulate Error</span>
-                                </label>
-
-                                <label className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        checked={filterEnabled}
-                                        onChange={(e) => setFilterEnabled(e.target.checked)}
-                                        className="w-3 h-3 bg-gray-700 border-gray-600 rounded"
-                                    />
-                                    <span className="text-xs text-gray-300">Enable Filtering</span>
-                                </label>
-
-                                <label className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        checked={paginationEnabled}
-                                        onChange={(e) => setPaginationEnabled(e.target.checked)}
-                                        className="w-3 h-3 bg-gray-700 border-gray-600 rounded"
-                                    />
-                                    <span className="text-xs text-gray-300">Enable Pagination</span>
-                                </label>
-                            </div>
-
-                            {/* Conditional Key Field input - only shown when filtering is enabled */}
-                            {filterEnabled && (
-                                <div>
-                                    <label className="block text-xs text-gray-300 mb-1 font-medium">Key Field</label>
-                                    <div className="flex flex-col space-y-1">
-                                        <input
-                                            type="text"
-                                            value={keyField}
-                                            onChange={(e) => setKeyField(e.target.value)}
-                                            placeholder="id"
-                                            className="w-full bg-gray-800/60 border border-gray-700 rounded-md px-3 py-2 text-xs text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                        />
-                                        <p className="text-xs text-gray-500">
-                                            Field name that will be used as identifier in query parameters (e.g., <span className="font-mono text-gray-400">?id=123</span> for filtering)
-                                        </p>
+                        <div className="flex items-center gap-2 mb-3">
+                            <Info size={16} className="text-blue-400" />
+                            <h3 className="text-sm font-medium text-gray-300">Your API supports the following query parameters:</h3>
+                        </div>
+                        
+                        <div className="space-y-3 text-xs">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {/* Filtering */}
+                                <div className="bg-gray-800/60 p-3 rounded-lg border border-gray-700">
+                                    <h4 className="font-medium text-gray-200 mb-1">Filtering</h4>
+                                    <div className="flex gap-2 mb-1">
+                                        <code className="px-1.5 py-0.5 bg-gray-700 rounded text-amber-400">
+                                            ?{keyField || 'id'}=value
+                                        </code>
                                     </div>
+                                    <p className="text-gray-500">
+                                        Filter array responses by the key field value
+                                    </p>
                                 </div>
-                            )}
 
-                            {/* Add explanation for pagination if enabled */}
-                            {paginationEnabled && (
-                                <div className="text-xs text-gray-500 pt-1">
-                                    <p>Pagination will support query parameters:</p>
-                                    <ul className="list-disc pl-4 pt-1 space-y-1">
-                                        <li><span className="font-mono text-gray-400">?page=1</span> - Page number</li>
-                                        <li><span className="font-mono text-gray-400">?limit=10</span> - Items per page</li>
-                                    </ul>
+                                {/* Pagination */}
+                                <div className="bg-gray-800/60 p-3 rounded-lg border border-gray-700">
+                                    <h4 className="font-medium text-gray-200 mb-1">Pagination</h4>
+                                    <div className="flex flex-wrap gap-2 mb-1">
+                                        <code className="px-1.5 py-0.5 bg-gray-700 rounded text-amber-400">
+                                            ?page=1&limit=10
+                                        </code>
+                                    </div>
+                                    <p className="text-gray-500">
+                                        Paginate results (only works with arrays)
+                                    </p>
                                 </div>
-                            )}
+                                
+                                {/* Error Simulation */}
+                                <div className="bg-gray-800/60 p-3 rounded-lg border border-gray-700">
+                                    <h4 className="font-medium text-gray-200 mb-1">Error Simulation</h4>
+                                    <div className="flex gap-2 mb-1">
+                                        <code className="px-1.5 py-0.5 bg-gray-700 rounded text-amber-400">
+                                            ?error=true
+                                        </code>
+                                    </div>
+                                    <p className="text-gray-500">
+                                        Return an error response with your defined status code
+                                    </p>
+                                </div>
+                                
+                                {/* Delay */}
+                                <div className="bg-gray-800/60 p-3 rounded-lg border border-gray-700">
+                                    <h4 className="font-medium text-gray-200 mb-1">Custom Delay</h4>
+                                    <div className="flex gap-2 mb-1">
+                                        <code className="px-1.5 py-0.5 bg-gray-700 rounded text-amber-400">
+                                            ?delay=2000
+                                        </code>
+                                    </div>
+                                    <p className="text-gray-500">
+                                        Add a response delay in milliseconds
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            {/* Meta Data */}
+                            <div className="bg-gray-800/60 p-3 rounded-lg border border-gray-700">
+                                <h4 className="font-medium text-gray-200 mb-1">Pagination Metadata</h4>
+                                <div className="flex gap-2 mb-1">
+                                    <code className="px-1.5 py-0.5 bg-gray-700 rounded text-amber-400">
+                                        ?page=1&limit=10&_meta=true
+                                    </code>
+                                </div>
+                                <p className="text-gray-500">
+                                    Include pagination metadata in response
+                                </p>
+                            </div>
+                            
+                            {/* Combining Parameters */}
+                            <div className="bg-gray-800/60 p-3 rounded-lg border border-gray-700">
+                                <h4 className="font-medium text-gray-200 mb-1">Combining Parameters</h4>
+                                <div className="flex gap-2 mb-1">
+                                    <code className="px-1.5 py-0.5 bg-gray-700 rounded text-amber-400 text-xs break-all">
+                                        ?{keyField || 'id'}=123&page=1&limit=10&delay=1000
+                                    </code>
+                                </div>
+                                <p className="text-gray-500">
+                                    You can combine multiple query parameters
+                                </p>
+                            </div>
                         </div>
                     </motion.div>
                 )}

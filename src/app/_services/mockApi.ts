@@ -78,7 +78,7 @@ export async function getMockRoute(mockId: string) {
     });
 
     const data = await response.json();
-    return data;
+    return data[0];
   } catch (err: any) {
     console.error('Error retrieving mock route:', err);
     throw new Error(err.message || 'Failed to retrieve mock route');

@@ -14,13 +14,8 @@ type UserMock = {
   method: string;
   response: any;
   status: number;
-  delay: number;
-  error: boolean;
   isArray: boolean;
-  filterEnabled: boolean;
-  paginationEnabled: boolean;
   keyField: string;
-  defaultLimit: number;
 }
 
 type EndpointTableProps = {
@@ -217,11 +212,6 @@ function EndpointTable({ userMocks }: EndpointTableProps) {
                   {/* Status code indicator */}
                   <span className={`font-medium ${getStatusColor(mock.status)}`}>{mock.status}</span>
 
-                  {/* Delay indicator */}
-                  <span className={`${mock.delay > 0 ? 'text-gray-400' : 'text-gray-600/40'} text-xs min-w-[40px]`}>
-                    {mock.delay > 0 ? `${mock.delay}ms` : 'no delay'}
-                  </span>
-
                   {/* Feature indicators - better aligned with fixed widths */}
                   <div className="flex items-center gap-2.5 ml-1">
                     {/* Array indicator */}
@@ -232,31 +222,12 @@ function EndpointTable({ userMocks }: EndpointTableProps) {
                       [ ]
                     </span>
 
-                    {/* Error indicator */}
-                    <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded font-mono text-[10px] min-w-[42px] ${mock.error
-                      ? 'bg-rose-900/20 text-rose-400 border border-rose-800/30'
-                      : 'bg-gray-800 text-gray-500'
-                      }`}>
-                      ERR
-                    </span>
-
-                    {/* Filter indicator */}
-                    <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded font-mono text-[10px] min-w-[55px] ${mock.filterEnabled
-                      ? 'bg-emerald-900/20 text-emerald-400 border border-emerald-800/30'
-                      : 'bg-gray-800 text-gray-500'
-                      }`}>
-                      {mock.filterEnabled && mock.keyField
-                        ? `?${mock.keyField}`
-                        : 'FILTER'}
-                    </span>
-
-                    {/* Pagination indicator */}
-                    <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded font-mono text-[10px] min-w-[42px] ${mock.paginationEnabled
-                      ? 'bg-amber-900/20 text-amber-400 border border-amber-800/30'
-                      : 'bg-gray-800 text-gray-500'
-                      }`}>
-                      PAGE
-                    </span>
+                    {/* Key Field indicator */}
+                    {mock.keyField && (
+                      <span className="inline-flex items-center justify-center px-2 py-0.5 rounded font-mono text-[10px] bg-emerald-900/20 text-emerald-400 border border-emerald-800/30">
+                        ?{mock.keyField}
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -266,19 +237,37 @@ function EndpointTable({ userMocks }: EndpointTableProps) {
                   animate={{ opacity: hoveredId === mock._id ? 1 : 0 }}
                   transition={{ duration: 0.15 }}
                 >
-                  <button className="p-1 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-700">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open(`/api/mocks/${localStorage.getItem('username')}/${mock.route}`, '_blank');
+                    }}
+                    className="p-1 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-700"
+                  >
                     <Eye size={14} />
                   </button>
-                  <button className="p-1 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-700">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/dashboard/${mock.route}?id=${mock._id}`);
+                    }}
+                    className="p-1 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-700"
+                  >
                     <Play size={14} />
                   </button>
                   <button
-                    onClick={() => handleEditOpen(mock)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditOpen(mock);
+                    }}
                     className="p-1 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-700">
                     <Edit size={14} />
                   </button>
                   <button
-                    onClick={() => handleDeleteOpen(mock)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteOpen(mock);
+                    }}
                     className="p-1 rounded-md text-gray-400 hover:text-rose-300 hover:bg-rose-500/10">
                     <Trash2 size={14} />
                   </button>
