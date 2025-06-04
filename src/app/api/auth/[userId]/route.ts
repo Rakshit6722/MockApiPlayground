@@ -2,18 +2,12 @@ import { connectToDb } from "@/lib/mongoose";
 import { User } from "@/models/User";
 import { NextRequest, NextResponse } from "next/server";
 
-type RouteParams = {
-  params: {
-    userId: string;
-  };
-};
-
 export async function GET(
   request: NextRequest,
-  { params }: RouteParams
+  context: any // <-- Let Next.js handle the type internally
 ) {
   await connectToDb();
-  const { userId } = params;
+  const { userId } = context.params;
 
   if (!userId) {
     return NextResponse.json(
