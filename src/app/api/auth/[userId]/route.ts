@@ -4,10 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
     req: NextRequest,
-    context: { params: { userId: string } }
+    { params }: { params: { userId: string } }
 ) {
     await connectToDb()
-    const { userId } = await context.params;
+    const { userId } = params; // Remove 'await' - params is not a Promise
 
     if (!userId) {
         return NextResponse.json(
