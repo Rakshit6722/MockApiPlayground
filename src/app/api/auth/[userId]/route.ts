@@ -2,28 +2,34 @@ import { connectToDb } from "@/lib/mongoose";
 import { User } from "@/models/User";
 import { NextRequest, NextResponse } from "next/server";
 
+type RouteParams = {
+  params: {
+    userId: string;
+  };
+};
+
 export async function GET(
-    req: NextRequest,
-    { params }: { params: { userId: string } }
+  request: NextRequest,
+  { params }: RouteParams
 ) {
-    await connectToDb()
-    const { userId } = params; // Remove 'await' - params is not a Promise
+  await connectToDb();
+  const { userId } = params;
 
-    if (!userId) {
-        return NextResponse.json(
-            { error: "User ID is required" },
-            { status: 400 }
-        )
-    }
+  if (!userId) {
+    return NextResponse.json(
+      { error: "User ID is required" },
+      { status: 400 }
+    );
+  }
 
-    const user = await User.findById(userId).select("-password");
+  const user = await User.findById(userId).select("-password");
 
-    if (!user) {
-        return NextResponse.json(
-            { error: "User not found" },
-            { status: 404 }
-        )
-    }
+  if (!user) {
+    return NextResponse.json(
+      { error: "User not found" },
+      { status: 404 }
+    );
+  }
 
-    return NextResponse.json(user, { status: 200 });
+  return NextResponse.json(user, { status: 200 });
 }
