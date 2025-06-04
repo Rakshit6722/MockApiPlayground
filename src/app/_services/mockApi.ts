@@ -1,20 +1,17 @@
+import { apiConnector } from "./interceptor/apiConnector";
+
+const BASE_URL = '/api/mock';
+
 export async function updateMock(mockId: string, mockData: any): Promise<any> {
   try {
-    const response = await fetch(`/api/mock/${mockId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-      body: JSON.stringify(mockData)
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `Failed to update mock: ${response.status}`);
-    }
-
-    return await response.json();
+    const response = await apiConnector(
+      'PATCH',
+      `${BASE_URL}/${mockId}`,
+      mockData,
+      null,
+      true
+    )
+    return response
   } catch (error) {
     console.error('Error updating mock:', error);
     throw error;
@@ -23,20 +20,15 @@ export async function updateMock(mockId: string, mockData: any): Promise<any> {
 
 export async function deleteMock(mockId: string): Promise<any> {
   try {
-    const response = await fetch(`/api/mock/${mockId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    });
+    const response = await apiConnector(
+      'DELETE',
+      `${BASE_URL}/${mockId}`,
+      null,
+      null,
+      true
+    )
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `Failed to delete mock: ${response.status}`);
-    }
-
-    return await response.json();
+    return response
   } catch (error) {
     console.error('Error deleting mock:', error);
     throw error;
@@ -46,19 +38,17 @@ export async function deleteMock(mockId: string): Promise<any> {
 
 export async function createMockRoute(data: any) {
   try {
-    const response = await fetch('/api/mock', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-      body: JSON.stringify(data)
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to create endpoint');
+    const response = await apiConnector(
+      'POST',
+      BASE_URL,
+      data,
+      null,
+      true
+    )
+    if(response?.status !== 201) {
+      throw new Error('Failed to create mock route');
     }
-
+    return response
     return await response.json();
   } catch (err: any) {
     console.error('Error creating mock route:', err);
@@ -69,18 +59,42 @@ export async function createMockRoute(data: any) {
 
 export async function getMockRoute(mockId: string) {
   try {
-    const response = await fetch(`/api/mock/${mockId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    });
+    const response = await apiConnector(
+      'GET',
+      `${BASE_URL}/${mockId}`,
+      null,
+      null,
+      true
+    )
 
-    const data = await response.json();
-    return data[0];
+    if(response?.status !== 200) {
+      throw new Error('Failed to retrieve mock route');
+    }
+
+    return response?.data[0]
   } catch (err: any) {
     console.error('Error retrieving mock route:', err);
     throw new Error(err.message || 'Failed to retrieve mock route');
+  }
+}
+
+export async function getAllMockRoutes() {
+  try {
+    const response = await apiConnector(
+      'GET',
+      BASE_URL,
+      null,
+      null,
+      true
+    )
+
+    if(response?.status !== 200) {
+      throw new Error('Failed to retrieve mock routes');
+    }
+
+    return response?.data
+  } catch (err: any) {
+    console.error('Error retrieving mock routes:', err);
+    throw new Error(err.message || 'Failed to retrieve mock routes');
   }
 }

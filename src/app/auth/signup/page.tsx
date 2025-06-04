@@ -6,6 +6,8 @@ import * as z from 'zod';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { registerUser } from '@/app/_services/authApi';
+import { useRouter } from 'next/navigation';
 
 const signupSchema = z.object({
     username: z.string().min(5, 'Name must be at least 2 characters'),
@@ -16,6 +18,7 @@ const signupSchema = z.object({
 type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
+    const router = useRouter()
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
@@ -31,23 +34,13 @@ export default function SignupPage() {
     const onSubmit = async (data: SignupFormValues) => {
         setIsLoading(true);
         try {
-            const response = await fetch('/api/auth/signup', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
+            const response = await registerUser(data);
 
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.error || 'Signup failed');
+            if (response?.status !== 201) {
+                throw new Error(response?.data?.message || "Signup failed");
             }
 
-            console.log('Signup successful', result);
-
-            window.location.href = '/auth/login';
+            router.push('/auth/login');
 
         } catch (error) {
             console.error('Signup error:', error);

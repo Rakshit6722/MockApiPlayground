@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import Form, { EndpointFormValues } from '../_common/Form';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/redux/store';
 
 type CreateEndpointProps = {
     isOpen: boolean;
@@ -10,9 +12,11 @@ type CreateEndpointProps = {
 }
 
 function CreateEndpoint({ isOpen, onClose, onSave }: CreateEndpointProps) {
-    const [username, setUsername] = useState('');
+ 
+    const usernameFromSlice = useSelector((state: RootState) => state.user.userInfo.username)
 
-    // Set username from localStorage when the component mounts or modal opens
+    const [username, setUsername] = useState<string>(usernameFromSlice || '');
+
     useEffect(() => {
         if (isOpen) {
             setUsername(localStorage.getItem('username') || '');
@@ -29,11 +33,7 @@ function CreateEndpoint({ isOpen, onClose, onSave }: CreateEndpointProps) {
                 route: values.route,
                 status: values.status,
                 response: values.response,
-                delay: values.delay,
                 isArray: values.isArray,
-                error: values.error,
-                filterEnabled: values.filterEnabled,
-                paginationEnabled: values.paginationEnabled,
                 keyField: values.keyField,
                 defaultLimit: 10
             };

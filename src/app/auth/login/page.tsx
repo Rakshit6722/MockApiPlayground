@@ -7,6 +7,9 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { login } from '@/app/_services/authApi';
+import { useDispatch } from 'react-redux';
+import { setIsLoggedIn, setUserInfo } from '@/app/redux/slices/userSlice';
 
 // Form validation schema
 const loginSchema = z.object({
@@ -19,10 +22,11 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export default function LoginPage() {
 
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -30,42 +34,34 @@ export default function LoginPage() {
       password: '',
     },
   });
-  
+
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
+      console.log("data", data);
       // Call your login API here
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      
-      const result = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(result.error || 'Login failed');
-      }
+      const result = await login(data);
 
-      console.log('Login successful', result);
-      
+      dispatch(setUserInfo({
+        username: result.username,
+        email: result.email,
+        token: result.token,
+      }))
+
       localStorage.setItem('token', result.token);
-      localStorage.setItem('userId', result.userId);
-      localStorage.setItem('username', result.username);
-      
+
+      dispatch(setIsLoggedIn(true));
+
       router.push('/dashboard');
 
 
     } catch (error) {
       console.error('Login error:', error);
-      // You can set an error state here to display to the user
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center">
       {/* Background blur elements */}
@@ -73,8 +69,8 @@ export default function LoginPage() {
         <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[120px]"></div>
         <div className="absolute top-1/3 left-1/3 w-[250px] h-[250px] bg-purple-500/10 rounded-full blur-[120px]"></div>
       </div>
-      
-      <motion.div 
+
+      <motion.div
         className="bg-neutral-900 border border-neutral-800 p-8 rounded-xl w-full max-w-md relative z-10"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -87,7 +83,7 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold mb-2">Welcome back</h1>
           <p className="text-neutral-400">Sign in to your account</p>
         </div>
-        
+
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div className="space-y-2">
             <label htmlFor="email" className="block text-sm font-medium">
@@ -105,7 +101,7 @@ export default function LoginPage() {
               <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
             )}
           </div>
-          
+
           <div className="space-y-2">
             <div className="flex justify-between">
               <label htmlFor="password" className="block text-sm font-medium">
@@ -136,7 +132,7 @@ export default function LoginPage() {
               <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
             )}
           </div>
-          
+
           <button
             type="submit"
             disabled={isLoading}
@@ -149,7 +145,7 @@ export default function LoginPage() {
             )}
           </button>
         </form>
-        
+
         <div className="mt-6 text-center text-neutral-400 text-sm">
           Don't have an account?{' '}
           <Link href="/auth/signup" className="text-blue-400 hover:text-blue-300">

@@ -6,6 +6,9 @@ import Form from '../_common/Form';
 import { deleteMock, updateMock } from '@/app/_services/mockApi';
 import DeletePopup from './DeletePopup';
 import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/redux/store';
+import { getMethodColor, getStatusColor, containerVariants, itemVariants } from '@/app/utils/dashboard';
 
 type UserMock = {
   _id: string;
@@ -19,33 +22,18 @@ type UserMock = {
 }
 
 type EndpointTableProps = {
-  userMocks: UserMock[]
+  userMocks: UserMock[],
+  openCreateModal?: () => void;
+  handleChange: (action: string, data: any) => void;
 }
 
-const getMethodColor = (method: string) => {
-  switch (method.toUpperCase()) {
-    case 'GET': return 'text-blue-400 border-blue-400';
-    case 'POST': return 'text-emerald-400 border-emerald-400';
-    case 'PUT': return 'text-amber-400 border-amber-400';
-    case 'PATCH': return 'text-orange-400 border-orange-400';
-    case 'DELETE': return 'text-rose-400 border-rose-400';
-    default: return 'text-gray-400 border-gray-400';
-  }
-};
-
-const getStatusColor = (status: number) => {
-  if (status >= 200 && status < 300) return 'text-emerald-400';
-  if (status >= 300 && status < 400) return 'text-blue-400';
-  if (status >= 400 && status < 500) return 'text-amber-400';
-  if (status >= 500) return 'text-rose-400';
-  return 'text-gray-400';
-};
-
-function EndpointTable({ userMocks }: EndpointTableProps) {
+function EndpointTable({ userMocks, openCreateModal, handleChange }: EndpointTableProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [editFormOpen, setEditFormOpen] = useState(false);
   const [selectedMock, setSelectedMock] = useState<any | null>(null);
   const [deletePopupOpen, setDeletePopupOpen] = useState(false);
+
+  const username = useSelector((state: RootState) => state.user.userInfo.username);
 
   const router = useRouter()
 
@@ -77,8 +65,10 @@ function EndpointTable({ userMocks }: EndpointTableProps) {
     if (selectedMock._id) {
       try {
         const response = await deleteMock(selectedMock._id);
-        const data = await response.json();
-        console.log('Mock deleted successfully:', data);
+        if (response?.status !== 200) {
+          throw new Error('Failed to delete mock');
+        }
+        handleChange('delete', selectedMock);
         setDeletePopupOpen(false);
         setSelectedMock(null);
       } catch (err: any) {
@@ -90,7 +80,14 @@ function EndpointTable({ userMocks }: EndpointTableProps) {
   const handleSubmit = async (data: any) => {
     try {
       const response = await updateMock(selectedMock?._id, data);
-      console.log('Mock updated successfully:', response);
+      if (response?.status !== 200) {
+        throw new Error('Failed to update mock');
+      }
+      handleChange('update', response?.data?.mock)
+      setEditFormOpen(false);
+      setSelectedMock(null);
+      localStorage.removeItem('editFormOpen');
+      localStorage.removeItem('editMockId');
     } catch (err: any) {
       console.error('Error submitting form:', err);
     }
@@ -127,24 +124,7 @@ function EndpointTable({ userMocks }: EndpointTableProps) {
     localStorage.removeItem('deleteMockId');
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.05
-      }
-    }
-  };
 
-  const itemVariants = {
-    hidden: { y: 10, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { type: 'spring', stiffness: 200, damping: 20 }
-    }
-  };
 
   if (!userMocks || userMocks.length === 0) {
     return (
@@ -155,7 +135,9 @@ function EndpointTable({ userMocks }: EndpointTableProps) {
       >
         <h3 className="text-lg font-medium text-gray-200 mb-2">No endpoints yet</h3>
         <p className="text-gray-400 text-sm mb-5">Create your first endpoint to get started</p>
-        <button className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 text-sm rounded-md transition-colors flex items-center gap-2 mx-auto">
+        <button
+          onClick={openCreateModal}
+          className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 text-sm rounded-md transition-colors flex items-center gap-2 mx-auto">
           <Plus size={16} />
           <span>Create Endpoint</span>
         </button>
@@ -237,16 +219,16 @@ function EndpointTable({ userMocks }: EndpointTableProps) {
                   animate={{ opacity: hoveredId === mock._id ? 1 : 0 }}
                   transition={{ duration: 0.15 }}
                 >
-                  <button 
+                  <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      window.open(`/api/mocks/${localStorage.getItem('username')}/${mock.route}`, '_blank');
+                      window.open(`/api/mocks/${username}/${mock.route}`, '_blank');
                     }}
                     className="p-1 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-700"
                   >
                     <Eye size={14} />
                   </button>
-                  <button 
+                  <button
                     onClick={(e) => {
                       e.stopPropagation();
                       router.push(`/dashboard/${mock.route}?id=${mock._id}`);
@@ -307,7 +289,7 @@ function EndpointTable({ userMocks }: EndpointTableProps) {
               onCancel={handleEditClose}
               onSubmit={handleSubmit}
               submitLabel='Update Endpoint'
-              username={localStorage.getItem('username') || ''}
+              username={username || ''}
             />
           </div>
         </div>,
@@ -317,7 +299,7 @@ function EndpointTable({ userMocks }: EndpointTableProps) {
       {
         deletePopupOpen && selectedMock && createPortal(
           <DeletePopup handleDelete={handleDelete} onClose={onCloseDeletePopup} />,
-          document.body // This renders the modal directly to the body element
+          document.body
         )
       }
     </div>
