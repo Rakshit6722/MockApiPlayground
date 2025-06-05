@@ -18,6 +18,18 @@ export async function POST(req: NextRequest) {
             )
         }
 
+        const routePresent = await Mock.findOne({
+            route: body.route,
+            userId: userId
+        })
+
+        if (routePresent) {
+            return NextResponse.json(
+                { error: "Mock with this route already exists" },
+                { status: 400 }
+            )
+        }
+
         const newMock = await Mock.create({
             ...body,
             userId: userId

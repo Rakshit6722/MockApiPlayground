@@ -49,6 +49,13 @@ function EndpointTable({ userMocks, openCreateModal, handleChange }: EndpointTab
           responseBody: JSON.stringify(foundMock.response, null, 2)
         });
       }
+
+      return () => {
+        setEditFormOpen(false);
+        setSelectedMock(null);
+        localStorage.removeItem('editFormOpen');
+        localStorage.removeItem('editMockId');
+      }
     }
     const deleteOpen = localStorage.getItem('deletePopupOpen') === 'true';
     const deleteId = localStorage.getItem('deleteMockId');
