@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
 
         const userId = req.headers.get('x-user-id') || req.headers.get('user-id');
         console.log("User ID from request:", userId);
-
+ 
         if (!userId) {
             return NextResponse.json(
                 { error: "User ID is required" },

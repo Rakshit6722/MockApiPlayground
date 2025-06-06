@@ -81,7 +81,7 @@ function Page({ params, searchParams }: PageProps) {
         setTesting(true);
         try {
             const baseUrl = window.location.origin;
-            const url = `${baseUrl}/api/mocks/${localStorage.getItem('username')}/${routeDetails.route}`;
+            const url = `${baseUrl}/api/mocks/${username}/${routeDetails.route}`;
 
             const response = await fetch(url);
             const data = await response.json();
