@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import TabMenu from '@/app/_components/_dashboard/details/TabMenu';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/redux/store';
 
 type PageProps = {
     params: {
@@ -37,6 +39,9 @@ function Page({ params, searchParams }: PageProps) {
     const [notFound, setNotFound] = useState(false);
     const [activeTab, setActiveTab] = useState('overview');
     const [visibleSection, setVisibleSection] = useState<string | null>(null);
+
+        const username = useSelector((state: RootState) => state.user.userInfo.username) || 'defaultUser';
+
 
     const unwrappedSearchParmas: {
         id?: string;
@@ -133,7 +138,6 @@ function Page({ params, searchParams }: PageProps) {
 
     // Build the full API URL
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-    const username = localStorage.getItem('username') || '';
     const fullApiUrl = `${baseUrl}/api/mocks/${username}/${routeDetails.route}`;
 
     return (
