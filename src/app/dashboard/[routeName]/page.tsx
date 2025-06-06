@@ -40,7 +40,7 @@ function Page({ params, searchParams }: PageProps) {
     const [activeTab, setActiveTab] = useState('overview');
     const [visibleSection, setVisibleSection] = useState<string | null>(null);
 
-        const username = useSelector((state: RootState) => state.user.userInfo.username) || 'defaultUser';
+    const username = useSelector((state: RootState) => state.user.userInfo.username) || 'defaultUser';
 
 
     const unwrappedSearchParmas: {
@@ -50,6 +50,7 @@ function Page({ params, searchParams }: PageProps) {
 
     useEffect(() => {
         findMockDetails();
+        console.log("username from redux:", username);
     }, [id]);
 
     const findMockDetails = async () => {
