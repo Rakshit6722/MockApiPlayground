@@ -19,7 +19,6 @@ function CreateEndpoint({ isOpen, onClose, onSave }: CreateEndpointProps) {
 
     useEffect(() => {
         if (isOpen) {
-            setUsername(localStorage.getItem('username') || '');
             localStorage.setItem('createEndpointOpen', 'true');
         } else {
             localStorage.removeItem('createEndpointOpen');

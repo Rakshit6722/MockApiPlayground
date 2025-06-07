@@ -2,7 +2,7 @@ import { connectToDb } from "@/lib/mongoose";
 import { User } from "@/models/User";
 import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
-import * as jose from 'jose';  // Replace jsonwebtoken with jose
+import * as jose from 'jose';  
 
 
 export async function POST(req: NextRequest) {

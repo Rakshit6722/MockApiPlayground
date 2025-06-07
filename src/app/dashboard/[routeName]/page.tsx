@@ -50,7 +50,6 @@ function Page({ params, searchParams }: PageProps) {
 
     useEffect(() => {
         findMockDetails();
-        console.log("username from redux:", username);
     }, [id]);
 
     const findMockDetails = async () => {
