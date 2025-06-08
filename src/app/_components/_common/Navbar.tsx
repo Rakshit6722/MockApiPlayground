@@ -9,11 +9,8 @@ function Navbar() {
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="font-semibold text-xl">MockAPI</div>
           <div className="flex items-center gap-6">
-            <Link href="/docs" className="text-neutral-400 hover:text-white transition-colors">
+            <Link href="/documentation" className="text-neutral-400 hover:text-white transition-colors">
               Docs
-            </Link>
-            <Link href="/pricing" className="text-neutral-400 hover:text-white transition-colors">
-              Pricing
             </Link>
             <Link href="/auth/login" className="text-neutral-400 hover:text-white transition-colors">
               Login

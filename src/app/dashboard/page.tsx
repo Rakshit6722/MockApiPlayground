@@ -273,6 +273,7 @@ function DashboardPage() {
                       <p className="text-xs text-gray-400 mb-2">View the documentation for your API</p>
                       <button
                         className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1"
+                        onClick={() => window.location.href = '/documentation'}
                       >
                         <span>View Docs</span>
                         <ExternalLink size={10} />
