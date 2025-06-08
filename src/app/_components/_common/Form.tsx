@@ -155,8 +155,101 @@ function Form({
             setJsonError('Invalid JSON format');
         }
     };
+
+       // const generateAIData = async () => {
+    //     // Validate inputs
+    //     if (!dataType.trim()) {
+    //         setGenerationError('Please specify what type of data to generate');
+    //         return;
+    //     }
+        
+    //     setGeneratingData(true);
+    //     setGenerationError('');
+        
+    //     try {
+    //         // Build the prompt
+    //         const prompt = `Generate a JSON ${isArray ? 'array' : 'object'} of ${dataLength} ${dataType} items.${
+    //             keyFields.trim() ? ` Each item should include these fields: ${keyFields}.` : ''
+    //         } Make the data realistic and varied. Format it as valid JSON and dont put it inside a key field, directly return the array or object.`;
+            
+    //         // Send to API
+    //         const response = await axios.post('/api/generate-response', {
+    //             prompt
+    //         });
+            
+    //         // Improved response handling with better error reporting
+    //         if (response.data) {
+    //             // Log the entire response structure for debugging
+    //             console.log('AI Response structure:', response.data);
+                
+    //             let jsonContent;
+                
+    //             if (response.data.response) {
+    //                 jsonContent = response.data.response;
+    //             } else if (response.data.data) {
+    //                 jsonContent = response.data.data;
+    //             } else if (response.data.content) {
+    //                 jsonContent = response.data.content;
+    //             } else if (response.data.result) {
+    //                 jsonContent = response.data.result;
+    //             } else if (typeof response.data === 'string') {
+    //                 jsonContent = response.data;
+    //             } else {
+    //                 jsonContent = JSON.stringify(response.data);
+    //             }
+                
+    //             try {
+    //                 let cleanedResponse = jsonContent;
+                    
+    //                 if (typeof cleanedResponse === 'string') {
+    //                     if (cleanedResponse.includes('```json')) {
+    //                         cleanedResponse = cleanedResponse.split('```json')[1].split('```')[0].trim();
+    //                     } else if (cleanedResponse.includes('```')) {
+    //                         cleanedResponse = cleanedResponse.split('```')[1].split('```')[0].trim();
+    //                     }
+                        
+    //                     cleanedResponse = cleanedResponse
+    //                         .replace(/^Here's the JSON data:/i, '')
+    //                         .replace(/^I've generated/i, '')
+    //                         .replace(/^The generated/i, '')
+    //                         .trim();
+    //                 }
+                    
+    //                 let parsedJSON;
+    //                 if (typeof cleanedResponse === 'string') {
+    //                     parsedJSON = JSON.parse(cleanedResponse);
+    //                 } else {
+    //                     parsedJSON = cleanedResponse;
+    //                 }
+                    
+    //                 setResponseBody(JSON.stringify(parsedJSON, null, 2));
+    //                 setJsonError('');
+                    
+    //                 if (Array.isArray(parsedJSON)) {
+    //                     setIsArray(true);
+    //                 }
+                    
+    //                 setShowAIGenerator(false);
+    //             } catch (parseError) {
+    //                 console.error('Error parsing AI generated response:', parseError);
+    //                 console.log('Raw response that failed to parse:', jsonContent);
+    //                 setGenerationError('The AI generated invalid JSON. Please try again.');
+    //             }
+    //         } else {
+    //             throw new Error('Empty response from AI generator');
+    //         }
+    //     } catch (err: any) {
+    //         console.error('Error generating data with AI:', err);
+    //         setGenerationError(
+    //             `Failed to generate data: ${err.response?.data?.error || err.message || 'Unknown error'}. Please try again.`
+    //         );
+    //     } finally {
+    //         setGeneratingData(false);
+    //     }
+    // };
     
     // Handle AI data generation
+    // Update the generateAIData function to use Groq API directly
     const generateAIData = async () => {
         // Validate inputs
         if (!dataType.trim()) {
@@ -168,52 +261,53 @@ function Form({
         setGenerationError('');
         
         try {
+            // Build the system message to guide the AI
+            const systemMessage = `You are a JSON data generator. Generate valid, well-formatted JSON data based on user requests. 
+Always respond with properly formatted JSON only - no explanations, comments, or markdown formatting.`;
+
             // Build the prompt
-            const prompt = `Generate a JSON ${isArray ? 'array' : 'object'} of ${dataLength} ${dataType} items.${
+            const userPrompt = `Generate a JSON ${isArray ? 'array' : 'object'} of ${dataLength} ${dataType} items.${
                 keyFields.trim() ? ` Each item should include these fields: ${keyFields}.` : ''
-            } Make the data realistic and varied. Format it as valid JSON and dont put it inside a key field, directly return the array or object.`;
+            } Make the data realistic and varied. Format as valid JSON without any explanations or text - I need pure JSON only.`;
             
-            // Send to API
-            const response = await axios.post('/api/generate-response', {
-                prompt
-            });
-            
-            // Improved response handling with better error reporting
-            if (response.data) {
-                // Log the entire response structure for debugging
-                console.log('AI Response structure:', response.data);
-                
-                let jsonContent;
-                
-                // Try different possible response formats
-                if (response.data.response) {
-                    jsonContent = response.data.response;
-                } else if (response.data.data) {
-                    jsonContent = response.data.data;
-                } else if (response.data.content) {
-                    jsonContent = response.data.content;
-                } else if (response.data.result) {
-                    jsonContent = response.data.result;
-                } else if (typeof response.data === 'string') {
-                    jsonContent = response.data;
-                } else {
-                    // If we can't find a known property, stringify the entire response
-                    jsonContent = JSON.stringify(response.data);
+            // Send request directly to Groq API
+            const response = await axios.post(
+                'https://api.groq.com/openai/v1/chat/completions',
+                {
+                    model: "meta-llama/llama-4-scout-17b-16e-instruct",
+                    messages: [
+                        { role: "system", content: systemMessage },
+                        { role: "user", content: userPrompt }
+                    ],
+                    temperature: 0.7,
+                    max_tokens: 4000
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer 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'
+                    }
                 }
+            );
+            
+            console.log('Groq API response:', response.data);
+            
+            if (response.data && response.data.choices && response.data.choices.length > 0) {
+                const jsonContent = response.data.choices[0].message.content;
                 
                 try {
-                    // Try to clean and parse the response
                     let cleanedResponse = jsonContent;
                     
-                    // If the response contains markdown code blocks, extract the JSON
+                    // Clean up response if needed
                     if (typeof cleanedResponse === 'string') {
+                        // Remove markdown code blocks if present
                         if (cleanedResponse.includes('```json')) {
                             cleanedResponse = cleanedResponse.split('```json')[1].split('```')[0].trim();
                         } else if (cleanedResponse.includes('```')) {
                             cleanedResponse = cleanedResponse.split('```')[1].split('```')[0].trim();
                         }
                         
-                        // Remove common non-JSON text AI might include
+                        // Remove common prefixes
                         cleanedResponse = cleanedResponse
                             .replace(/^Here's the JSON data:/i, '')
                             .replace(/^I've generated/i, '')
@@ -221,39 +315,64 @@ function Form({
                             .trim();
                     }
                     
-                    // Handle both string and object responses
+                    // Parse the JSON
                     let parsedJSON;
-                    if (typeof cleanedResponse === 'string') {
+                    try {
                         parsedJSON = JSON.parse(cleanedResponse);
-                    } else {
-                        parsedJSON = cleanedResponse;
+                        console.log('Successfully parsed JSON');
+                    } catch (initialParseError) {
+                        // If parsing fails, try to repair common issues
+                        console.log('Initial parsing failed, attempting to repair JSON');
+                        
+                        // Try to extract JSON from text
+                        const jsonRegex = /(\{|\[)[\s\S]*(\}|\])/;
+                        const match = cleanedResponse.match(jsonRegex);
+                        
+                        if (match) {
+                            try {
+                                parsedJSON = JSON.parse(match[0]);
+                                console.log('Extracted and parsed JSON successfully');
+                            } catch (extractError) {
+                                throw new Error('Failed to parse extracted JSON');
+                            }
+                        } else {
+                            throw new Error('Could not find valid JSON in response');
+                        }
                     }
                     
-                    // Update the response body
+                    // Update form with parsed JSON
                     setResponseBody(JSON.stringify(parsedJSON, null, 2));
                     setJsonError('');
                     
-                    // If the generated data is an array, update the isArray checkbox
+                    // Update isArray if needed
                     if (Array.isArray(parsedJSON)) {
                         setIsArray(true);
                     }
                     
-                    // Close the AI generator panel
+                    // Close AI generator
                     setShowAIGenerator(false);
                 } catch (parseError) {
                     console.error('Error parsing AI generated response:', parseError);
                     console.log('Raw response that failed to parse:', jsonContent);
-                    setGenerationError('The AI generated invalid JSON. Please try again.');
+                    
+                    // More specific error message
+                    setGenerationError(
+                        'The AI generated invalid JSON. Try with fewer items or simpler data structure.'
+                    );
                 }
             } else {
-                throw new Error('Empty response from AI generator');
+                throw new Error('Invalid or empty response from AI service');
             }
         } catch (err: any) {
             console.error('Error generating data with AI:', err);
-            // More detailed error message
-            setGenerationError(
-                `Failed to generate data: ${err.response?.data?.error || err.message || 'Unknown error'}. Please try again.`
-            );
+            
+            // More detailed error reporting
+            const errorMessage = err.response?.data?.error?.message || 
+                                err.response?.data?.error || 
+                                err.message || 
+                                'Unknown error';
+            
+            setGenerationError(`Failed to generate data: ${errorMessage}. Please try again.`);
         } finally {
             setGeneratingData(false);
         }

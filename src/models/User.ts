@@ -13,6 +13,14 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    resetToken:{
+        type: String,
+        default: null,
+    },
+    resetTokenExpiration: {
+        type: Date,
+        default: null,
+    },
 })
 
 export const User = mongoose.models.User || mongoose.model("User", UserSchema);

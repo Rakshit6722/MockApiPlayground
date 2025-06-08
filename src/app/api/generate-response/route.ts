@@ -13,7 +13,7 @@ export async function POST(
         const { prompt } = body
 
         const response = await axios.post(`${BASE_URL}/generate`, {
-            model: "wizardlm2:7b",
+            model: "gemma3",
             prompt: prompt,
             stream: false,
         }, {

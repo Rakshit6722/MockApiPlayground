@@ -3,6 +3,7 @@ import { User } from "@/models/User";
 import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 import * as jose from 'jose';  
+import { nanoid } from 'nanoid';
 
 
 export async function POST(req: NextRequest) {
@@ -46,6 +47,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Create JWT token using jose instead of jsonwebtoken
+
+    const jti = nanoid();
+
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const token = await new jose.SignJWT({ 
         userId: user._id.toString(), 
@@ -53,6 +57,7 @@ export async function POST(req: NextRequest) {
     })
         .setProtectedHeader({ alg: 'HS256' })
         .setIssuedAt()
+        .setJti(jti)
         .setExpirationTime('7d')
         .sign(secret);
 

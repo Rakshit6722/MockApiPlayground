@@ -27,7 +27,7 @@ type EndpointTableProps = {
   handleChange: (action: string, data: any) => void;
 }
 
-function EndpointTable({ userMocks, openCreateModal, handleChange }: EndpointTableProps) {
+function EndpointTable({ userMocks = [], openCreateModal, handleChange }: EndpointTableProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [editFormOpen, setEditFormOpen] = useState(false);
   const [selectedMock, setSelectedMock] = useState<any | null>(null);
@@ -40,7 +40,7 @@ function EndpointTable({ userMocks, openCreateModal, handleChange }: EndpointTab
   useEffect(() => {
     const editOpen = localStorage.getItem('editFormOpen') === 'true';
     const editId = localStorage.getItem('editMockId');
-    if (editOpen && editId) {
+    if (userMocks.length > 0 && (editOpen && editId)) {
       const foundMock = userMocks.find(m => m._id === editId);
       if (foundMock) {
         setEditFormOpen(true);
@@ -59,7 +59,7 @@ function EndpointTable({ userMocks, openCreateModal, handleChange }: EndpointTab
     }
     const deleteOpen = localStorage.getItem('deletePopupOpen') === 'true';
     const deleteId = localStorage.getItem('deleteMockId');
-    if (deleteOpen && deleteId) {
+    if (userMocks.length > 0 && (deleteOpen && deleteId)) {
       const foundMock = userMocks.find(m => m._id === deleteId);
       if (foundMock) {
         setDeletePopupOpen(true);
@@ -133,36 +133,16 @@ function EndpointTable({ userMocks, openCreateModal, handleChange }: EndpointTab
 
 
 
-  if (!userMocks || userMocks.length === 0) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="rounded-lg bg-gray-900 p-6 text-center border border-gray-800"
-      >
-        <h3 className="text-lg font-medium text-gray-200 mb-2">No endpoints yet</h3>
-        <p className="text-gray-400 text-sm mb-5">Create your first endpoint to get started</p>
-        <button
-          onClick={openCreateModal}
-          className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 text-sm rounded-md transition-colors flex items-center gap-2 mx-auto">
-          <Plus size={16} />
-          <span>Create Endpoint</span>
-        </button>
-      </motion.div>
-    );
-  }
-
   return (
     <div
-      onClick={() => router}
       className="w-full overflow-hidden rounded-lg bg-gray-900 border border-gray-800 cursor-pointer">
       <div className="px-4 py-3 border-b border-gray-800 flex justify-between items-center">
         <h2 className="text-sm font-medium text-gray-200">API Endpoints</h2>
         <div className="flex gap-1">
-          <button className="p-1.5 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors">
-            <Filter size={16} />
-          </button>
-          <button className="p-1.5 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors">
+          <button
+            onClick={openCreateModal}
+            className="p-1.5 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors"
+          >
             <Plus size={16} />
           </button>
         </div>
@@ -174,97 +154,99 @@ function EndpointTable({ userMocks, openCreateModal, handleChange }: EndpointTab
         initial="hidden"
         animate="visible"
       >
-        {userMocks.map((mock) => (
-          <motion.div
-            key={mock._id}
-            className={`px-4 py-2.5 hover:bg-gray-800/50 transition-colors ${hoveredId === mock._id ? 'bg-gray-800/50' : ''
-              }`}
-            variants={itemVariants}
-            onMouseEnter={() => setHoveredId(mock._id)}
-            onMouseLeave={() => setHoveredId(null)}
-            onClick={() => {
-              router.push(`/dashboard/${mock.route}?id=${mock._id}`);
-            }}
-          >
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className={`border px-2 py-0.5 rounded text-xs font-medium ${getMethodColor(mock.method)}`}>
-                  {mock.method}
-                </div>
-                <div className="font-mono text-xs text-gray-300 truncate">
-                  {mock.route}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 text-xs">
-                  {/* Status code indicator */}
-                  <span className={`font-medium ${getStatusColor(mock.status)}`}>{mock.status}</span>
-
-                  {/* Feature indicators - better aligned with fixed widths */}
-                  <div className="flex items-center gap-2.5 ml-1">
-                    {/* Array indicator */}
-                    <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded font-mono text-[10px] min-w-[42px] ${mock.isArray
-                      ? 'bg-blue-900/20 text-blue-400 border border-blue-800/30'
-                      : 'bg-gray-800 text-gray-500'
-                      }`}>
-                      [ ]
-                    </span>
-
-                    {/* Key Field indicator */}
-                    {mock.keyField && (
-                      <span className="inline-flex items-center justify-center px-2 py-0.5 rounded font-mono text-[10px] bg-emerald-900/20 text-emerald-400 border border-emerald-800/30">
-                        ?{mock.keyField}
-                      </span>
-                    )}
+        {userMocks.length > 0 ? (
+          // Existing mapping logic for userMocks
+          userMocks.map((mock) => (
+            <motion.div
+              key={mock._id}
+              className={`px-4 py-2.5 hover:bg-gray-800/50 transition-colors ${hoveredId === mock._id ? 'bg-gray-800/50' : ''}`}
+              variants={itemVariants}
+              onMouseEnter={() => setHoveredId(mock._id)}
+              onMouseLeave={() => setHoveredId(null)}
+              onClick={() => {
+                router.push(`/dashboard/${mock.route}?id=${mock._id}`);
+              }}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className={`border px-2 py-0.5 rounded text-xs font-medium ${getMethodColor(mock.method)}`}>
+                    {mock.method}
+                  </div>
+                  <div className="font-mono text-xs text-gray-300 truncate">
+                    {mock.route}
                   </div>
                 </div>
 
-                <motion.div
-                  className="flex items-center gap-1"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: hoveredId === mock._id ? 1 : 0 }}
-                  transition={{ duration: 0.15 }}
-                >
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      window.open(`/api/mocks/${username}/${mock.route}`, '_blank');
-                    }}
-                    className="p-1 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-700"
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 text-xs">
+                    {/* Status code indicator */}
+                    <span className={`font-medium ${getStatusColor(mock.status)}`}>{mock.status}</span>
+
+                    {/* Feature indicators - better aligned with fixed widths */}
+                    <div className="flex items-center gap-2.5 ml-1">
+                      {/* Array indicator */}
+                      <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded font-mono text-[10px] min-w-[42px] ${mock.isArray
+                        ? 'bg-blue-900/20 text-blue-400 border border-blue-800/30'
+                        : 'bg-gray-800 text-gray-500'
+                        }`}>
+                        [ ]
+                      </span>
+
+                      {/* Key Field indicator */}
+                      {mock.keyField && (
+                        <span className="inline-flex items-center justify-center px-2 py-0.5 rounded font-mono text-[10px] bg-emerald-900/20 text-emerald-400 border border-emerald-800/30">
+                          ?{mock.keyField}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <motion.div
+                    className="flex items-center gap-1"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: hoveredId === mock._id ? 1 : 0 }}
+                    transition={{ duration: 0.15 }}
                   >
-                    <Eye size={14} />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/dashboard/${mock.route}?id=${mock._id}`);
-                    }}
-                    className="p-1 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-700"
-                  >
-                    <Play size={14} />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEditOpen(mock);
-                    }}
-                    className="p-1 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-700">
-                    <Edit size={14} />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteOpen(mock);
-                    }}
-                    className="p-1 rounded-md text-gray-400 hover:text-rose-300 hover:bg-rose-500/10">
-                    <Trash2 size={14} />
-                  </button>
-                </motion.div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditOpen(mock);
+                      }}
+                      className="p-1 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-700">
+                      <Edit size={14} />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteOpen(mock);
+                      }}
+                      className="p-1 rounded-md text-gray-400 hover:text-rose-300 hover:bg-rose-500/10">
+                      <Trash2 size={14} />
+                    </button>
+                  </motion.div>
+                </div>
               </div>
-            </div>
+            </motion.div>
+          ))
+        ) : (
+          // Empty state message inside the table
+          <motion.div
+            variants={itemVariants}
+            className="py-10 text-center"
+          >
+            <h3 className="text-base font-medium text-gray-300 mb-2">No endpoints yet</h3>
+            <p className="text-gray-400 text-sm mb-5 max-w-xs mx-auto">
+              Create your first endpoint to start building your mock API
+            </p>
+            <button
+              onClick={openCreateModal}
+              className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 text-sm rounded-md transition-colors flex items-center gap-2 mx-auto"
+            >
+              <Plus size={16} />
+              <span>Create Endpoint</span>
+            </button>
           </motion.div>
-        ))}
+        )}
       </motion.div>
 
       <div className="px-4 py-2.5 border-t border-gray-800 flex justify-between items-center">

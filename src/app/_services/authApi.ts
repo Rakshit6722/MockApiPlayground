@@ -37,3 +37,20 @@ export async function registerUser(data: any) {
         throw new Error(err?.message ?? "Internal server error");
     }
 }
+
+
+export async function logout() {
+    try {
+        const response = await apiConnector(
+            'GET',
+            `${BASE_URL}/logout`,
+            null,
+            null,
+            true
+        )
+        return response?.data
+    } catch (err: any) {
+        console.error("Error in authApi:", err);
+        throw new Error(err?.message ?? "Internal server error");
+    }
+}

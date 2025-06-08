@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { inter, montserrat, jetbrainsMono } from './fonts';
 import "./globals.css";
-import { Provider } from "react-redux";
-import { persistor, store } from "./redux/store";
-import { PersistGate } from 'redux-persist/integration/react'
 import Providers from "./providers/ReduxProvider";
 
 const geistSans = Geist({
@@ -29,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${montserrat.variable} ${jetbrainsMono.variable} antialiased`}
       >
         <Providers>
           {children}

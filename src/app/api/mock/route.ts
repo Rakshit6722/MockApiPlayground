@@ -71,7 +71,7 @@ export async function GET(
         if (!mocks || mocks.length === 0) {
             return NextResponse.json(
                 { error: "No mocks found for this user" },
-                { status: 404 }
+                { status: 200 }
             )
         }
 
