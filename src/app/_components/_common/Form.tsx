@@ -285,7 +285,7 @@ Always respond with properly formatted JSON only - no explanations, comments, or
                 {
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer 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'
+                        'Authorization': `Bearer ${process.env.GROK_API_KEY}`
                     }
                 }
             );
