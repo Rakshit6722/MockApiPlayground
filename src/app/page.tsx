@@ -96,7 +96,7 @@ const fetchData = async () => {
               </motion.div>
 
               <motion.h1
-                className="text-4xl md:text-7xl font-bold mb-6 tracking-tight text-center bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 font-heading"
+                className="text-4xl md:text-7xl font-bold  tracking-tight text-center pb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 font-heading"
                 initial={{ opacity: 0, y: 10 }}
                 animate={heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
                 transition={{ delay: 0.3 }}
@@ -127,12 +127,12 @@ const fetchData = async () => {
                 >
                   Get started <ArrowRight size={16} />
                 </Link>
-                <Link
+                {/* <Link
                   href="/dashboard"
                   className="bg-neutral-800 hover:bg-neutral-700 px-6 py-3 rounded-lg font-medium transition-all hover:translate-y-[-2px]"
                 >
                   View demo
-                </Link>
+                </Link> */}
               </motion.div>
             </motion.div>
 

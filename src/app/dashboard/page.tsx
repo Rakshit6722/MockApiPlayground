@@ -5,7 +5,7 @@ import EndpointTable from '../_components/_dashboard/EndpointTable';
 import CreateEndpoint from '../_components/_dashboard/CreateEndpoint';
 import {
   Plus, Server, Code, Zap,
-  RefreshCw, Copy, ExternalLink, Command, LogOut
+  RefreshCw, Copy, ExternalLink, Command, LogOut, Check
 } from 'lucide-react';
 import { createMockRoute, getAllMockRoutes } from '../_services/mockApi';
 import { logout } from '../_services/authApi';
@@ -27,6 +27,8 @@ function DashboardPage() {
     totalEndpoints: 0
   });
   const [refreshing, setRefreshing] = useState(false);
+  const [copiedBaseUrl, setCopiedBaseUrl] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem('createEndpointOpen') === 'true') {
@@ -118,9 +120,10 @@ function DashboardPage() {
 
   const handleCopyBaseUrl = () => {
     navigator.clipboard.writeText(window.location.origin + '/api/mock');
+    setCopiedBaseUrl(true);
+    setTimeout(() => setCopiedBaseUrl(false), 5000);
   };
 
-  // When opening/closing the CreateEndpoint modal, persist state in localStorage
   const openCreateModal = () => {
     setIsCreateModalOpen(true);
     localStorage.setItem('createEndpointOpen', 'true');
@@ -132,6 +135,7 @@ function DashboardPage() {
 
   const handleLogout = async () => {
     try {
+      setLogoutLoading(true)
       const data = await logout()
       if (data?.message === 'Logout successful') {
         localStorage.removeItem('token');
@@ -142,6 +146,8 @@ function DashboardPage() {
     } catch (err) {
       console.error('Error during logout:', err);
       return;
+    } finally {
+      setLogoutLoading(false)
     }
 
 
@@ -157,7 +163,6 @@ function DashboardPage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 py-8 relative">
-          {/* Header Section - Update this section to include the logout button */}
           <motion.div
             className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
             initial={{ opacity: 0, y: -20 }}
@@ -172,16 +177,25 @@ function DashboardPage() {
             </div>
 
             <div className="flex gap-3">
-              {/* Add logout button here */}
               <button
+                disabled={logoutLoading}
                 onClick={handleLogout}
                 className="p-2 rounded-md flex items-center gap-2 bg-gray-800/50 hover:bg-gray-800 border border-gray-700 transition-all text-rose-400 hover:text-rose-300 hover:border-rose-700/50"
                 title="Logout"
               >
-                <LogOut size={16} />
-                <p className='text-sm font-medium'>
-                  Logout
-                </p>
+                {
+                  logoutLoading ? (
+                    <span className="animate-pulse">Logging out...</span>
+                  ) : (
+                    <>
+                      <LogOut size={16} />
+                      <p className='text-sm font-medium'>
+                        Logout
+                      </p>
+                    </>
+                  )
+                }
+
               </button>
               <button
                 onClick={handleRefresh}
@@ -247,17 +261,19 @@ function DashboardPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-3 border border-gray-800 rounded-md bg-gray-800/50 hover:bg-gray-800 transition-colors">
                   <div className="flex items-start gap-3">
-                    <div className="p-2 bg-blue-900/30 text-blue-400 rounded-md">
-                      <Copy size={16} />
+                    <div className={`p-2 ${copiedBaseUrl ? 'bg-green-900/30 text-green-400' : 'bg-blue-900/30 text-blue-400'} rounded-md transition-colors`}>
+                      {copiedBaseUrl ? <Check size={16} /> : <Copy size={16} />}
                     </div>
                     <div>
                       <h3 className="text-sm font-medium mb-1">Copy Base URL</h3>
                       <p className="text-xs text-gray-400 mb-2">Copy your API base URL to clipboard</p>
                       <button
                         onClick={handleCopyBaseUrl}
-                        className="text-xs text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1"
+                        className={`text-xs ${copiedBaseUrl
+                          ? 'text-green-400 hover:text-green-300'
+                          : 'text-blue-400 hover:text-blue-300'} transition-colors flex items-center cursor-pointer gap-1`}
                       >
-                        <span>Copy URL</span>
+                        <span>{copiedBaseUrl ? 'Copied!' : 'Copy URL'}</span>
                       </button>
                     </div>
                   </div>
@@ -272,7 +288,7 @@ function DashboardPage() {
                       <h3 className="text-sm font-medium mb-1">API Documentation</h3>
                       <p className="text-xs text-gray-400 mb-2">View the documentation for your API</p>
                       <button
-                        className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1"
+                        className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1 cursor-pointer"
                         onClick={() => window.location.href = '/documentation'}
                       >
                         <span>View Docs</span>

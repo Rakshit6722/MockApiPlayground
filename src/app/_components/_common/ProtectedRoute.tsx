@@ -1,17 +1,31 @@
 import { useRouter } from 'next/navigation';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
     const router = useRouter()
 
-    const isLoggedIn = typeof window !== 'undefined' && localStorage.getItem('token') !== null;
+    const [isChecking, setIsChecking] = useState(true)
 
-    if (!isLoggedIn) {
-        if (typeof window !== 'undefined') {
+
+    useEffect(() => {
+
+        const isLoggedIn = localStorage.getItem('token');
+
+        if (!isLoggedIn) {
             router.push('/auth/login');
+        } else {
+            setIsChecking(false);
         }
-        return null;
+
+    }, [router])
+
+    if (isChecking) {
+        return (
+            <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+                <div className="w-12 h-12 border-4 border-gray-800 border-t-blue-500 rounded-full animate-spin"></div>
+            </div>
+        );
     }
 
     return <>{children}</>;
