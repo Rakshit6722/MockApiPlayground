@@ -11,6 +11,7 @@ import { login } from '@/app/_services/authApi';
 import { useDispatch } from 'react-redux';
 import { setIsLoggedIn, setUserInfo } from '@/app/redux/slices/userSlice';
 import AuthRoute from '@/app/_components/_common/AuthRoute';
+import { toast } from 'react-toastify';
 
 // Form validation schema
 const loginSchema = z.object({
@@ -28,7 +29,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormValues>({
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
@@ -39,8 +40,6 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
-      console.log("data", data);
-      // Call your login API here
       const result = await login(data);
 
       dispatch(setUserInfo({
@@ -56,10 +55,11 @@ export default function LoginPage() {
       router.push('/dashboard');
 
 
-    } catch (error) {
-      console.error('Login error:', error);
+    } catch (error: any) {
+      toast.error(error?.message || "An error occurred during login. Please try again later.");
     } finally {
       setIsLoading(false);
+      reset();
     }
   };
 

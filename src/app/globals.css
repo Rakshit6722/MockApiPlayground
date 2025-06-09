@@ -61,3 +61,13 @@ code, pre, .font-mono {
   scrollbar-width: thin;
   scrollbar-color: rgba(55, 65, 81, 0.8) rgba(31, 41, 55, 0.2);
 }
+
+
+.my-toast {
+  background: #222;
+  border-radius: 10px;
+}
+.my-toast-body {
+  color: #e23145;
+  font-weight: bold;
+}

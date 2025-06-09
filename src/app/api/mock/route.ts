@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
 
         const userId = req.headers.get('x-user-id') || req.headers.get('user-id');
         console.log("User ID from request:", userId);
- 
+
         if (!userId) {
             return NextResponse.json(
                 { error: "User ID is required" },
@@ -82,6 +82,42 @@ export async function GET(
 
     } catch (err: any) {
         console.error("Error in GET /api/mock:", err);
+        return NextResponse.json(
+            { error: "Internal server error" },
+            { status: 500 }
+        )
+    }
+}
+
+export async function DELETE(req: NextRequest) {
+    try {
+        const userId = req.headers.get('x-user-id') || req.headers.get('user-id');
+        if (!userId) {
+            return NextResponse.json(
+                { error: "User ID is required" },
+                { status: 400 }
+            )
+        }
+
+        const mocks = await Mock.deleteMany({
+            userId: userId
+        })
+
+        if (mocks.deletedCount === 0) {
+            return NextResponse.json(
+                { error: "No mocks found for this user" },
+                { status: 404 }
+            )
+        }
+
+        return NextResponse.json(
+            { message: "Mocks deleted successfully" },
+            { status: 200 }
+        )
+
+
+    } catch (err: any) {
+        console.error("Error in DELETE /api/mock:", err);
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }

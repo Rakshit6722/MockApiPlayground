@@ -1,18 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { AlertCircle, ArrowLeft, CheckCircle, Loader } from 'lucide-react';
+import { AlertCircle, ArrowLeft, CheckCircle, Loader, RefreshCw } from 'lucide-react';
+import { forgotPassword } from '@/app/_services/authApi';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [countdown, setCountdown] = useState(0);
   const router = useRouter();
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -21,8 +31,12 @@ export default function ForgotPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    await sendResetLink();
+  };
+
+  const sendResetLink = async (isResend = false) => {
     setError('');
-    
+
     // Validate email
     if (!email.trim()) {
       setError('Email is required');
@@ -37,14 +51,15 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('/api/auth/forgot-password', { email });
-      
-      if (response.status === 200) {
+      const response: any = await forgotPassword(email)
+
+      if (response?.status === 200) {
         setSuccess(true);
+        setCountdown(60);
       }
     } catch (err: any) {
       console.error('Password reset request failed:', err);
-      
+
       if (err.response?.data?.error) {
         setError(err.response.data.error);
       } else {
@@ -52,6 +67,12 @@ export default function ForgotPasswordPage() {
       }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResend = () => {
+    if (countdown === 0) {
+      sendResetLink(true);
     }
   };
 
@@ -64,7 +85,7 @@ export default function ForgotPasswordPage() {
       </div>
 
       <div className="w-full max-w-md">
-        <motion.div 
+        <motion.div
           className="bg-gray-900/80 backdrop-blur-sm border border-gray-800 rounded-lg shadow-xl p-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -72,8 +93,8 @@ export default function ForgotPasswordPage() {
         >
           {/* Header */}
           <div className="mb-6">
-            <Link 
-              href="/auth/login" 
+            <Link
+              href="/auth/login"
               className="text-gray-400 hover:text-gray-300 flex items-center gap-1 text-sm mb-6"
             >
               <ArrowLeft size={14} />
@@ -96,15 +117,33 @@ export default function ForgotPasswordPage() {
               <div>
                 <h3 className="font-medium mb-1">Reset email sent</h3>
                 <p className="text-sm text-green-300/80">
-                  We've sent a password reset link to <span className="font-mono">{email}</span>. 
-                  Please check your inbox and follow the instructions.
+                  We've sent a password reset link to <span className="font-mono">{email}</span>.
+                  Please check your inbox or spam and follow the instructions.
                 </p>
-                <button 
-                  onClick={() => router.push('/auth/login')}
-                  className="mt-3 text-sm text-green-400 hover:text-green-300 font-medium"
-                >
-                  Return to login
-                </button>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <button
+                    onClick={() => router.push('/auth/login')}
+                    className="text-sm text-green-400 hover:text-green-300 font-medium"
+                  >
+                    Return to login
+                  </button>
+
+                  <button
+                    onClick={handleResend}
+                    disabled={countdown > 0 || isLoading}
+                    className={`text-sm flex items-center gap-1.5 ${countdown > 0
+                        ? 'text-gray-500 cursor-not-allowed'
+                        : 'text-blue-400 hover:text-blue-300 font-medium'
+                      }`}
+                  >
+                    <RefreshCw size={14} className={countdown > 0 ? '' : 'animate-spin'} />
+                    {isLoading
+                      ? 'Sending...'
+                      : countdown > 0
+                        ? `Resend in ${countdown}s`
+                        : 'Resend link'}
+                  </button>
+                </div>
               </div>
             </motion.div>
           ) : (
@@ -112,7 +151,7 @@ export default function ForgotPasswordPage() {
             <form onSubmit={handleSubmit}>
               {/* Error Message */}
               {error && (
-                <motion.div 
+                <motion.div
                   className="mb-4 bg-rose-900/20 border border-rose-800/30 text-rose-300 px-3 py-2 rounded-md text-sm flex items-center gap-2"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -121,7 +160,7 @@ export default function ForgotPasswordPage() {
                   <span>{error}</span>
                 </motion.div>
               )}
-              
+
               {/* Email Input */}
               <div className="mb-4">
                 <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
@@ -137,16 +176,15 @@ export default function ForgotPasswordPage() {
                   required
                 />
               </div>
-              
+
               {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full flex items-center justify-center gap-2 py-2 px-4 rounded-md font-medium transition-colors ${
-                  isLoading
+                className={`w-full flex items-center justify-center gap-2 py-2 px-4 rounded-md font-medium transition-colors ${isLoading
                     ? 'bg-blue-800/50 cursor-not-allowed text-blue-200/50'
                     : 'bg-blue-600 hover:bg-blue-700 text-white'
-                }`}
+                  }`}
               >
                 {isLoading ? (
                   <>

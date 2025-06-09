@@ -45,14 +45,16 @@ export async function createMockRoute(data: any) {
       null,
       true
     )
-    if(response?.status !== 201) {
+    if (response?.status !== 201) {
       throw new Error('Failed to create mock route');
     }
     return response
-    return await response.json();
   } catch (err: any) {
-    console.error('Error creating mock route:', err);
-    throw new Error(err.message || 'Failed to create mock route');
+    if (err?.response?.status === 400) {
+      throw new Error('Mock route with this name already exists');
+    } else {
+      throw new Error(err.message || 'Failed to create mock route');
+    }
   }
 }
 
@@ -67,7 +69,7 @@ export async function getMockRoute(mockId: string) {
       true
     )
 
-    if(response?.status !== 200) {
+    if (response?.status !== 200) {
       throw new Error('Failed to retrieve mock route');
     }
 
@@ -88,7 +90,7 @@ export async function getAllMockRoutes() {
       true
     )
 
-    if(response?.status !== 200) {
+    if (response?.status !== 200) {
       throw new Error('Failed to retrieve mock routes');
     }
 
@@ -96,5 +98,20 @@ export async function getAllMockRoutes() {
   } catch (err: any) {
     console.error('Error retrieving mock routes:', err);
     throw new Error(err.message || 'Failed to retrieve mock routes');
+  }
+}
+
+export async function deleteAllMocks() {
+  try {
+    const response = await apiConnector(
+      'DELETE',
+      BASE_URL,
+      null,
+      null,
+      true
+    )
+    return response?.data
+  } catch (err: any) {
+    throw new Error(err.message || 'Failed to delete all mocks');
   }
 }

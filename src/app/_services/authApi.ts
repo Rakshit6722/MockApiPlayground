@@ -17,8 +17,13 @@ export async function login(data: any) {
             throw new Error(response?.data?.message || "Login failed");
         }
     } catch (err: any) {
-        console.error("Error in authApi:", err);
-        throw new Error(err?.message ?? "Internal server error");
+        if (err?.response?.status === 404) {
+            throw new Error("User not found");
+        } else if (err?.response?.status === 401) {
+            throw new Error("Invalid password");
+        } else {
+            throw new Error(err?.message ?? "Internal server error");
+        }
     }
 }
 
@@ -33,8 +38,9 @@ export async function registerUser(data: any) {
         )
         return response
     } catch (err: any) {
-        console.error("Error in authApi:", err);
-        throw new Error(err?.message ?? "Internal server error");
+        if (err?.response?.status === 409) {
+            throw new Error("User already exists");
+        }
     }
 }
 
@@ -51,6 +57,52 @@ export async function logout() {
         return response?.data
     } catch (err: any) {
         console.error("Error in authApi:", err);
+        throw new Error(err?.message ?? "Internal server error");
+    }
+}
+
+export async function forgotPassword(email: string) {
+    try {
+        const response = await apiConnector(
+            'POST',
+            `${BASE_URL}/forgot-password`,
+            { email },
+            null,
+            false
+        )
+
+        throw response?.data
+    } catch (err: any) {
+        throw new Error(err?.message ?? "Internal server error");
+    }
+}
+
+export async function verifyResetToken(token: string, email: string) {
+    try {
+        const response = await apiConnector(
+            'POST',
+            `${BASE_URL}/verify-reset-token`,
+            { token, email },
+            null,
+            false
+        )
+        return response?.data
+    } catch (err: any) {
+        throw new Error(err?.message ?? "Internal server error");
+    }
+}
+
+export async function resetPassword(token: string, email: string, newPassword: string) {
+    try {
+        const response = await apiConnector(
+            'POST',
+            `${BASE_URL}/reset-password`,
+            { token, email, password: newPassword },
+            null,
+            false
+        )
+        return response?.data
+    } catch (err: any) {
         throw new Error(err?.message ?? "Internal server error");
     }
 }

@@ -6,6 +6,8 @@ import Link from 'next/link';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { AlertCircle, ArrowLeft, CheckCircle, Eye, EyeOff, Loader, Lock } from 'lucide-react';
+import { resetPassword, verifyResetToken } from '@/app/_services/authApi';
+import { toast } from 'react-toastify';
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
@@ -17,7 +19,7 @@ export default function ResetPasswordPage() {
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isTokenValid, setIsTokenValid] = useState(true);
-  
+
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -25,31 +27,28 @@ export default function ResetPasswordPage() {
     // Get token and email from URL
     const urlToken = searchParams.get('token');
     const urlEmail = searchParams.get('email');
-    
+
     if (!urlToken || !urlEmail) {
       setIsTokenValid(false);
       setError('Invalid or expired reset link. Please request a new one.');
       return;
     }
-    
+
     setToken(urlToken);
     setEmail(urlEmail);
-    
-    // Optional: Verify token validity with API
-    // This could be a separate API endpoint that just checks if the token is valid
-    // without actually resetting the password
+
     const verifyToken = async () => {
       try {
-        await axios.post('/api/auth/verify-reset-token', { 
-          token: urlToken,
-          email: urlEmail 
-        });
+        const response = await verifyResetToken(token, email);
+        if (response.status !== 200) {
+          throw new Error('Invalid token');
+        }
       } catch (err) {
         setIsTokenValid(false);
         setError('This password reset link has expired or is invalid. Please request a new one.');
       }
     };
-    
+
     verifyToken();
   }, [searchParams]);
 
@@ -58,42 +57,37 @@ export default function ResetPasswordPage() {
       setError('Password must be at least 8 characters long');
       return false;
     }
-    
+
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return false;
     }
-    
+
     return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (!validatePassword()) {
       return;
     }
-    
+
     setIsLoading(true);
 
     try {
-      const response = await axios.post('/api/auth/reset-password', {
-        token,
-        email,
-        password
-      });
-      
+      const response = await resetPassword(token, email, password);
+
       if (response.status === 200) {
         setSuccess(true);
-        // Redirect to login after 2 seconds
         setTimeout(() => {
           router.push('/auth/login');
         }, 2000);
       }
     } catch (err: any) {
-      console.error('Password reset failed:', err);
-      
+      toast.error('Password reset failed:', err);
+
       if (err.response?.data?.error) {
         setError(err.response.data.error);
       } else {
@@ -113,7 +107,7 @@ export default function ResetPasswordPage() {
       </div>
 
       <div className="w-full max-w-md">
-        <motion.div 
+        <motion.div
           className="bg-gray-900/80 backdrop-blur-sm border border-gray-800 rounded-lg shadow-xl p-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -121,8 +115,8 @@ export default function ResetPasswordPage() {
         >
           {/* Header */}
           <div className="mb-6">
-            <Link 
-              href="/auth/login" 
+            <Link
+              href="/auth/login"
               className="text-gray-400 hover:text-gray-300 flex items-center gap-1 text-sm mb-6"
             >
               <ArrowLeft size={14} />
@@ -130,7 +124,7 @@ export default function ResetPasswordPage() {
             </Link>
             <h1 className="text-2xl font-bold text-white mb-2">Reset Password</h1>
             <p className="text-gray-400 text-sm">
-              {isTokenValid 
+              {isTokenValid
                 ? `Enter a new password for ${email}`
                 : 'There was an issue with your reset link'}
             </p>
@@ -149,7 +143,7 @@ export default function ResetPasswordPage() {
                 <p className="text-sm text-green-300/80">
                   Your password has been updated. You will be redirected to the login page.
                 </p>
-                <button 
+                <button
                   onClick={() => router.push('/auth/login')}
                   className="mt-3 text-sm text-green-400 hover:text-green-300 font-medium"
                 >
@@ -170,7 +164,7 @@ export default function ResetPasswordPage() {
                 <p className="text-sm text-rose-300/80">
                   {error}
                 </p>
-                <Link 
+                <Link
                   href="/auth/forgot-password"
                   className="mt-3 text-sm text-rose-400 hover:text-rose-300 font-medium flex items-center gap-1"
                 >
@@ -183,7 +177,7 @@ export default function ResetPasswordPage() {
             <form onSubmit={handleSubmit}>
               {/* Error Message */}
               {error && (
-                <motion.div 
+                <motion.div
                   className="mb-4 bg-rose-900/20 border border-rose-800/30 text-rose-300 px-3 py-2 rounded-md text-sm flex items-center gap-2"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -192,7 +186,7 @@ export default function ResetPasswordPage() {
                   <span>{error}</span>
                 </motion.div>
               )}
-              
+
               {/* Password Input */}
               <div className="mb-4">
                 <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
@@ -218,7 +212,7 @@ export default function ResetPasswordPage() {
                 </div>
                 <p className="mt-1 text-xs text-gray-500">Must be at least 8 characters</p>
               </div>
-              
+
               {/* Confirm Password Input */}
               <div className="mb-6">
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-1">
@@ -236,16 +230,15 @@ export default function ResetPasswordPage() {
                   />
                 </div>
               </div>
-              
+
               {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full flex items-center justify-center gap-2 py-2 px-4 rounded-md font-medium transition-colors ${
-                  isLoading
-                    ? 'bg-blue-800/50 cursor-not-allowed text-blue-200/50'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white'
-                }`}
+                className={`w-full flex items-center justify-center gap-2 py-2 px-4 rounded-md font-medium transition-colors ${isLoading
+                  ? 'bg-blue-800/50 cursor-not-allowed text-blue-200/50'
+                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  }`}
               >
                 {isLoading ? (
                   <>

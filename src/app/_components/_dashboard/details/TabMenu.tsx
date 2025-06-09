@@ -89,7 +89,8 @@ function TabMenu({activeTab, routeDetails, fullApiUrl, toggleSection, visibleSec
                                     </h3>
                                 </div>
 
-                                <div className="p-5 space-y-4">
+                                <div className="p-5 space-y-5">
+                                    {/* cURL */}
                                     <div>
                                         <div className="text-xs text-gray-400 mb-1.5">cURL</div>
                                         <div className="group relative">
@@ -105,8 +106,9 @@ function TabMenu({activeTab, routeDetails, fullApiUrl, toggleSection, visibleSec
                                         </div>
                                     </div>
 
+                                    {/* JavaScript Fetch */}
                                     <div>
-                                        <div className="text-xs text-gray-400 mb-1.5">JavaScript Fetch</div>
+                                        <div className="text-xs text-gray-400 mb-1.5">JavaScript (Fetch)</div>
                                         <div className="group relative">
                                             <div className="bg-gray-800/70 rounded-lg p-3 font-mono text-xs text-gray-300 overflow-x-auto">
                                                 <span className="text-amber-400">fetch</span>(<span className="text-emerald-400">'{fullApiUrl}'</span>)<br />
@@ -121,6 +123,105 @@ function TabMenu({activeTab, routeDetails, fullApiUrl, toggleSection, visibleSec
                                             </button>
                                         </div>
                                     </div>
+                                    
+                                    {/* JavaScript Async/Await */}
+                                    <div>
+                                        <div className="text-xs text-gray-400 mb-1.5">JavaScript (Async/Await)</div>
+                                        <div className="group relative">
+                                            <div className="bg-gray-800/70 rounded-lg p-3 font-mono text-xs text-gray-300 overflow-x-auto">
+                                                <span className="text-purple-400">async</span> <span className="text-amber-400">function</span> <span className="text-blue-400">getData</span>() {`{`}<br />
+                                                {'  '}<span className="text-purple-400">try</span> {`{`}<br />
+                                                {'    '}<span className="text-blue-400">const</span> response = <span className="text-purple-400">await</span> <span className="text-amber-400">fetch</span>(<span className="text-emerald-400">'{fullApiUrl}'</span>);<br />
+                                                {'    '}<span className="text-blue-400">const</span> data = <span className="text-purple-400">await</span> response.<span className="text-amber-400">json</span>();<br />
+                                                {'    '}<span className="text-amber-400">console</span>.<span className="text-blue-400">log</span>(data);<br />
+                                                {'  '}{`}`} <span className="text-purple-400">catch</span> (error) {`{`}<br />
+                                                {'    '}<span className="text-amber-400">console</span>.<span className="text-blue-400">error</span>(<span className="text-emerald-400">'Error:'</span>, error);<br />
+                                                {'  '}{`}`}<br />
+                                                {`}`}
+                                            </div>
+                                            <button
+                                                onClick={() => copyToClipboard(`async function getData() {\n  try {\n    const response = await fetch('${fullApiUrl}');\n    const data = await response.json();\n    console.log(data);\n  } catch (error) {\n    console.error('Error:', error);\n  }\n}`, 'async-await')}
+                                                className="absolute top-2 right-2 p-1.5 rounded-md bg-gray-700/80 text-gray-400 hover:text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                {copied === 'async-await' ? <CheckCircle2 size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Axios */}
+                                    <div>
+                                        <div className="text-xs text-gray-400 mb-1.5">Axios</div>
+                                        <div className="group relative">
+                                            <div className="bg-gray-800/70 rounded-lg p-3 font-mono text-xs text-gray-300 overflow-x-auto">
+                                                <span className="text-amber-400">axios</span>.<span className="text-blue-400">get</span>(<span className="text-emerald-400">'{fullApiUrl}'</span>)<br />
+                                                {'  '}<span className="text-amber-400">.then</span>(response =&gt; {`{`}<br />
+                                                {'    '}<span className="text-amber-400">console</span>.<span className="text-blue-400">log</span>(response.data);<br />
+                                                {'  '}{`}`})<br />
+                                                {'  '}<span className="text-amber-400">.catch</span>(error =&gt; {`{`}<br />
+                                                {'    '}<span className="text-amber-400">console</span>.<span className="text-blue-400">error</span>(<span className="text-emerald-400">'Error:'</span>, error);<br />
+                                                {'  '}{`}`});
+                                            </div>
+                                            <button
+                                                onClick={() => copyToClipboard(`axios.get('${fullApiUrl}')\n  .then(response => {\n    console.log(response.data);\n  })\n  .catch(error => {\n    console.error('Error:', error);\n  });`, 'axios')}
+                                                className="absolute top-2 right-2 p-1.5 rounded-md bg-gray-700/80 text-gray-400 hover:text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                {copied === 'axios' ? <CheckCircle2 size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Python Requests */}
+                                    <div>
+                                        <div className="text-xs text-gray-400 mb-1.5">Python (Requests)</div>
+                                        <div className="group relative">
+                                            <div className="bg-gray-800/70 rounded-lg p-3 font-mono text-xs text-gray-300 overflow-x-auto">
+                                                <span className="text-purple-400">import</span> requests<br /><br />
+                                                response = requests.<span className="text-blue-400">get</span>(<span className="text-emerald-400">'{fullApiUrl}'</span>)<br />
+                                                <span className="text-purple-400">if</span> response.status_code == <span className="text-amber-400">200</span>:<br />
+                                                {'    '}data = response.<span className="text-blue-400">json</span>()<br />
+                                                {'    '}<span className="text-blue-400">print</span>(data)<br />
+                                                <span className="text-purple-400">else</span>:<br />
+                                                {'    '}<span className="text-blue-400">print</span>(<span className="text-emerald-400">f"Error: </span>{`{`}response.status_code{`}`}<span className="text-emerald-400">"</span>)
+                                            </div>
+                                            <button
+                                                onClick={() => copyToClipboard(`import requests\n\nresponse = requests.get('${fullApiUrl}')\nif response.status_code == 200:\n    data = response.json()\n    print(data)\nelse:\n    print(f"Error: {response.status_code}")`, 'python')}
+                                                className="absolute top-2 right-2 p-1.5 rounded-md bg-gray-700/80 text-gray-400 hover:text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                {copied === 'python' ? <CheckCircle2 size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* jQuery */}
+                                    <div>
+                                        <div className="text-xs text-gray-400 mb-1.5">jQuery</div>
+                                        <div className="group relative">
+                                            <div className="bg-gray-800/70 rounded-lg p-3 font-mono text-xs text-gray-300 overflow-x-auto">
+                                                $.<span className="text-amber-400">ajax</span>({`{`}<br />
+                                                {'  '}url: <span className="text-emerald-400">'{fullApiUrl}'</span>,<br />
+                                                {'  '}method: <span className="text-emerald-400">'GET'</span>,<br />
+                                                {'  '}dataType: <span className="text-emerald-400">'json'</span>,<br />
+                                                {'  '}success: <span className="text-blue-400">function</span>(data) {`{`}<br />
+                                                {'    '}<span className="text-amber-400">console</span>.<span className="text-blue-400">log</span>(data);<br />
+                                                {'  '}{`}`},<br />
+                                                {'  '}error: <span className="text-blue-400">function</span>(xhr, status, error) {`{`}<br />
+                                                {'    '}<span className="text-amber-400">console</span>.<span className="text-blue-400">error</span>(<span className="text-emerald-400">'Error:'</span>, error);<br />
+                                                {'  '}{`}`}<br />
+                                                {`}`});
+                                            </div>
+                                            <button
+                                                onClick={() => copyToClipboard(`$.ajax({\n  url: '${fullApiUrl}',\n  method: 'GET',\n  dataType: 'json',\n  success: function(data) {\n    console.log(data);\n  },\n  error: function(xhr, status, error) {\n    console.error('Error:', error);\n  }\n});`, 'jquery')}
+                                                className="absolute top-2 right-2 p-1.5 rounded-md bg-gray-700/80 text-gray-400 hover:text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                {copied === 'jquery' ? <CheckCircle2 size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div className="px-5 py-3 bg-blue-500/5 border-t border-blue-500/20 text-xs text-gray-400 flex items-center gap-2">
+                                    <Info size={14} className="text-blue-400" />
+                                    <span>Click the copy button in the top-right corner of each snippet to copy the code.</span>
                                 </div>
                             </div>
                         </div>

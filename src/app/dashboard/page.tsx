@@ -5,15 +5,16 @@ import EndpointTable from '../_components/_dashboard/EndpointTable';
 import CreateEndpoint from '../_components/_dashboard/CreateEndpoint';
 import {
   Plus, Server, Code, Zap,
-  RefreshCw, Copy, ExternalLink, Command, LogOut, Check
+  RefreshCw, Copy, ExternalLink, Command, LogOut, Check, Trash2
 } from 'lucide-react';
-import { createMockRoute, getAllMockRoutes } from '../_services/mockApi';
+import { createMockRoute, getAllMockRoutes, deleteAllMocks } from '../_services/mockApi';
 import { logout } from '../_services/authApi';
 import { useRouter } from 'next/navigation';
 import { persistor } from '../redux/store';
 import { useDispatch } from 'react-redux';
 import { logoutUser } from '../redux/slices/userSlice';
 import ProtectedRoute from '../_components/_common/ProtectedRoute';
+import { toast } from 'react-toastify';
 
 function DashboardPage() {
 
@@ -29,6 +30,8 @@ function DashboardPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [copiedBaseUrl, setCopiedBaseUrl] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
+  const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
+  const [deleteAllLoading, setDeleteAllLoading] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem('createEndpointOpen') === 'true') {
@@ -93,8 +96,30 @@ function DashboardPage() {
         throw new Error('Failed to create mock route');
       }
       findAllMocks();
-    } catch (err) {
-      console.error('Error creating endpoint:', err);
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to create mock route');
+    }
+  };
+
+  const handleDeleteAllEndpoints = async () => {
+    try {
+      setDeleteAllLoading(true);
+      const response = await deleteAllMocks();
+      
+      if (response) {
+        toast.success('All endpoints deleted successfully');
+        // Update UI state
+        setUserMocks([]);
+        setStats({
+          totalEndpoints: 0
+        });
+        setShowDeleteAllDialog(false);
+      }
+    } catch (error) {
+      toast.error('Failed to delete all endpoints');
+      console.error('Error deleting all endpoints:', error);
+    } finally {
+      setDeleteAllLoading(false);
     }
   };
 
@@ -185,7 +210,7 @@ function DashboardPage() {
               >
                 {
                   logoutLoading ? (
-                    <span className="animate-pulse">Logging out...</span>
+                    <span className="animate-pulse text-sm">Logging out...</span>
                   ) : (
                     <>
                       <LogOut size={16} />
@@ -258,7 +283,8 @@ function DashboardPage() {
                 Quick Actions
               </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Existing Copy Base URL action */}
                 <div className="p-3 border border-gray-800 rounded-md bg-gray-800/50 hover:bg-gray-800 transition-colors">
                   <div className="flex items-start gap-3">
                     <div className={`p-2 ${copiedBaseUrl ? 'bg-green-900/30 text-green-400' : 'bg-blue-900/30 text-blue-400'} rounded-md transition-colors`}>
@@ -279,6 +305,7 @@ function DashboardPage() {
                   </div>
                 </div>
 
+                {/* Existing API Documentation action */}
                 <div className="p-3 border border-gray-800 rounded-md bg-gray-800/50 hover:bg-gray-800 transition-colors">
                   <div className="flex items-start gap-3">
                     <div className="p-2 bg-emerald-900/30 text-emerald-400 rounded-md">
@@ -293,6 +320,25 @@ function DashboardPage() {
                       >
                         <span>View Docs</span>
                         <ExternalLink size={10} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* New Delete All Endpoints action */}
+                <div className="p-3 border border-gray-800 rounded-md bg-gray-800/50 hover:bg-gray-800 transition-colors">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-rose-900/30 text-rose-400 rounded-md">
+                      <Trash2 size={16} />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium mb-1">Delete All Endpoints</h3>
+                      <p className="text-xs text-gray-400 mb-2">Remove all your mock API endpoints</p>
+                      <button
+                        onClick={() => setShowDeleteAllDialog(true)}
+                        className="text-xs text-rose-400 hover:text-rose-300 transition-colors flex items-center gap-1 cursor-pointer"
+                      >
+                        <span>Delete All</span>
                       </button>
                     </div>
                   </div>
@@ -357,6 +403,49 @@ function DashboardPage() {
           onClose={closeCreateModal}
           onSave={handleCreateEndpoint}
         />
+
+        {/* Delete All Confirmation Dialog */}
+        {showDeleteAllDialog && (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+            <motion.div 
+              className="bg-gray-900 border border-gray-800 rounded-lg p-6 max-w-md w-full mx-4"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', damping: 20 }}
+            >
+              <h2 className="text-xl font-semibold text-white mb-2">Delete All Endpoints</h2>
+              <p className="text-gray-300 mb-6">
+                Are you sure you want to delete all your API endpoints? This action cannot be undone.
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setShowDeleteAllDialog(false)}
+                  className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-md transition-colors"
+                  disabled={deleteAllLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteAllEndpoints}
+                  className="px-4 py-2 bg-rose-600 hover:bg-rose-700 rounded-md transition-colors flex items-center gap-2"
+                  disabled={deleteAllLoading}
+                >
+                  {deleteAllLoading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Deleting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 size={16} />
+                      <span>Delete All</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
       </div>
 
     </ProtectedRoute>

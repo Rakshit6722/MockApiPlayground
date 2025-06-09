@@ -9,6 +9,7 @@ import { Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { registerUser } from '@/app/_services/authApi';
 import { useRouter } from 'next/navigation';
 import AuthRoute from '@/app/_components/_common/AuthRoute';
+import { toast } from 'react-toastify';
 
 const signupSchema = z.object({
     username: z.string().min(5, 'Name must be at least 2 characters'),
@@ -23,7 +24,7 @@ export default function SignupPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    const { register, handleSubmit, formState: { errors } } = useForm<SignupFormValues>({
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<SignupFormValues>({
         resolver: zodResolver(signupSchema),
         defaultValues: {
             username: '',
@@ -37,16 +38,18 @@ export default function SignupPage() {
         try {
             const response = await registerUser(data);
 
+
             if (response?.status !== 201) {
                 throw new Error(response?.data?.message || "Signup failed");
             }
 
             router.push('/auth/login');
 
-        } catch (error) {
-            console.error('Signup error:', error);
+        } catch (error: any) {
+            toast.error(error?.message || "An error occurred during signup. Please try again later.");
         } finally {
             setIsLoading(false);
+            reset();
         }
     };
 
