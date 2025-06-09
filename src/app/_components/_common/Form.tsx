@@ -270,6 +270,8 @@ Always respond with properly formatted JSON only - no explanations, comments, or
                 keyFields.trim() ? ` Each item should include these fields: ${keyFields}.` : ''
             } Make the data realistic and varied. Format as valid JSON without any explanations or text - I need pure JSON only.`;
             
+            console.log("api key", process.env.NEXT_PUBLIC_GROK_API_KEY);
+
             // Send request directly to Groq API
             const response = await axios.post(
                 'https://api.groq.com/openai/v1/chat/completions',
@@ -285,7 +287,7 @@ Always respond with properly formatted JSON only - no explanations, comments, or
                 {
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${process.env.GROK_API_KEY}`
+                        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_GROK_API_KEY}`
                     }
                 }
             );
