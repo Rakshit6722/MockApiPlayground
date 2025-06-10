@@ -61,8 +61,8 @@ export default function ForgotPasswordPage() {
     } catch (err: any) {
       console.error('Password reset request failed:', err);
 
-      if (err.response?.data?.error) {
-        setError(err.response.data.error);
+      if (err) {
+        setError(err.message || 'Failed to send password reset email. Please try again.');
       } else {
         setError('Failed to send password reset email. Please try again later.');
       }

@@ -73,6 +73,11 @@ export async function forgotPassword(email: string) {
 
         return response
     } catch (err: any) {
+        if (err?.response?.status === 404) {
+            throw new Error("User not found");
+        } else if (err?.response?.status === 400) {
+            throw new Error("Invalid email format");
+        }
         throw new Error(err?.message ?? "Internal server error");
     }
 }
