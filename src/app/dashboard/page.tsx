@@ -15,6 +15,7 @@ import { useDispatch } from 'react-redux';
 import { logoutUser } from '../redux/slices/userSlice';
 import ProtectedRoute from '../_components/_common/ProtectedRoute';
 import { toast } from 'react-toastify';
+import { containerVariants, itemVariants } from '../utils/dashboard';
 
 function DashboardPage() {
 
@@ -105,7 +106,7 @@ function DashboardPage() {
     try {
       setDeleteAllLoading(true);
       const response = await deleteAllMocks();
-      
+
       if (response) {
         toast.success('All endpoints deleted successfully');
         // Update UI state
@@ -120,26 +121,6 @@ function DashboardPage() {
       console.error('Error deleting all endpoints:', error);
     } finally {
       setDeleteAllLoading(false);
-    }
-  };
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { type: 'spring', stiffness: 100 }
     }
   };
 
@@ -183,8 +164,8 @@ function DashboardPage() {
       <div className="min-h-screen bg-gray-950 text-gray-200">
         {/* Decorative gradients */}
         <div className="fixed inset-0 pointer-events-none">
-          <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-blue-900/20 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2"></div>
-          <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-purple-900/20 rounded-full blur-[120px] translate-x-1/2 translate-y-1/2"></div>
+          <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px] translate-x-1/2 translate-y-1/2"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 py-8 relative">
@@ -194,11 +175,21 @@ function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-                Mock API Dashboard
-              </h1>
-              <p className="text-gray-400 mt-1">Manage your mock API endpoints and monitor usage</p>
+            <div className="flex items-center gap-3">
+              {/* MockFlow branded logo */}
+              <div className="flex items-center bg-gradient-to-r from-gray-800 to-black py-1.5 px-3 rounded-md border border-neutral-700 shadow-sm mr-1">
+                <img src="/favicon.ico" alt="MockFlow Logo" className="w-5 h-5 mr-2" />
+                <span className="font-bold text-lg tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-100">
+                  MockFlow
+                </span>
+              </div>
+              <div className="h-8 border-l border-gray-700 mx-1"></div>
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                  Dashboard
+                </h1>
+                <p className="text-gray-400 mt-1">Manage your mock API endpoints and monitor usage</p>
+              </div>
             </div>
 
             <div className="flex gap-3">
@@ -326,23 +317,28 @@ function DashboardPage() {
                 </div>
 
                 {/* New Delete All Endpoints action */}
-                <div className="p-3 border border-gray-800 rounded-md bg-gray-800/50 hover:bg-gray-800 transition-colors">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-rose-900/30 text-rose-400 rounded-md">
-                      <Trash2 size={16} />
+                {
+                  stats.totalEndpoints > 0 && (
+                    <div className="p-3 border border-gray-800 rounded-md bg-gray-800/50 hover:bg-gray-800 transition-colors">
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 bg-rose-900/30 text-rose-400 rounded-md">
+                          <Trash2 size={16} />
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium mb-1">Delete All Endpoints</h3>
+                          <p className="text-xs text-gray-400 mb-2">Remove all your mock API endpoints</p>
+                          <button
+                            onClick={() => setShowDeleteAllDialog(true)}
+                            className="text-xs text-rose-400 hover:text-rose-300 transition-colors flex items-center gap-1 cursor-pointer"
+                          >
+                            <span>Delete All</span>
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-sm font-medium mb-1">Delete All Endpoints</h3>
-                      <p className="text-xs text-gray-400 mb-2">Remove all your mock API endpoints</p>
-                      <button
-                        onClick={() => setShowDeleteAllDialog(true)}
-                        className="text-xs text-rose-400 hover:text-rose-300 transition-colors flex items-center gap-1 cursor-pointer"
-                      >
-                        <span>Delete All</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                  )
+                }
+
               </div>
             </motion.div>
           </motion.div>
@@ -407,7 +403,7 @@ function DashboardPage() {
         {/* Delete All Confirmation Dialog */}
         {showDeleteAllDialog && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-            <motion.div 
+            <motion.div
               className="bg-gray-900 border border-gray-800 rounded-lg p-6 max-w-md w-full mx-4"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}

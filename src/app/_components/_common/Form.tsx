@@ -261,13 +261,23 @@ function Form({
         setGenerationError('');
         
         try {
+            // Ensure 'id' is always included in keyFields
+            let fields = keyFields
+                .split(',')
+                .map(f => f.trim())
+                .filter(f => f.length > 0);
+
+            if (!fields.includes('id')) {
+                fields.unshift('id');
+            }
+
             // Build the system message to guide the AI
             const systemMessage = `You are a JSON data generator. Generate valid, well-formatted JSON data based on user requests. 
 Always respond with properly formatted JSON only - no explanations, comments, or markdown formatting.`;
 
             // Build the prompt
             const userPrompt = `Generate a JSON ${isArray ? 'array' : 'object'} of ${dataLength} ${dataType} items.${
-                keyFields.trim() ? ` Each item should include these fields: ${keyFields}.` : ''
+                fields.length > 0 ? ` Each item should include these fields: ${fields.join(', ')}.` : ''
             } Make the data realistic and varied. Format as valid JSON without any explanations or text - I need pure JSON only.`;
             
             console.log("api key", process.env.NEXT_PUBLIC_GROK_API_KEY);

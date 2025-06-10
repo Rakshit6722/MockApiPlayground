@@ -394,7 +394,7 @@ const fetchData = async () => {
                   </div>
 
                   <div className="relative z-10 flex-shrink-0">
-                    <div className="w-12 h-12 rounded-full bg-blue-600 border-4 border-black flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-full bg-blue-600 border-4 border-black flex items-center justify-center shadow-lg shadow-blue-500/30">
                       <span className="font-bold">{index + 1}</span>
                     </div>
                     <div className="absolute top-0 left-0 right-0 bottom-0 rounded-full bg-blue-600 opacity-40 animate-ping"></div>
@@ -425,27 +425,27 @@ const fetchData = async () => {
             <div className="grid md:grid-cols-3 gap-8">
               {[
                 {
-                  icon: <Code className="w-6 h-6 text-blue-500" />,
+                  icon: <Code className="w-6 h-6 text-cyan-500" />,
                   title: "Instant Mock APIs",
                   description: "Create custom API endpoints in seconds with JSON responses that match your needs.",
                   color: "blue"
                 },
                 {
-                  icon: <PauseCircle className="w-6 h-6 text-purple-500" />,
+                  icon: <PauseCircle className="w-6 h-6 text-blue-500" />,
                   title: "Simulate Real Conditions",
                   description: "Add network delays, error states, and conditional responses to test all scenarios.",
-                  color: "purple"
+                  color: "blue"
                 },
                 {
-                  icon: <RefreshCw className="w-6 h-6 text-green-500" />,
+                  icon: <RefreshCw className="w-6 h-6 text-cyan-500" />,
                   title: "Easy Management",
                   description: "Organize and version your mock APIs with an intuitive dashboard interface.",
-                  color: "green"
+                  color: "blue"
                 }
               ].map((feature, index) => (
                 <motion.div
                   key={index}
-                  className="bg-neutral-900 p-8 rounded-xl border border-neutral-800 group hover:border-gray-700 transition-all"
+                  className="bg-neutral-900 p-8 rounded-xl border border-neutral-800 group hover:border-blue-900/40 transition-all"
                   initial={{ opacity: 0, y: 30 }}
                   animate={featureInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -608,6 +608,10 @@ const fetchData = async () => {
             </div>
           </div>
         </section>
+
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 transform opacity-10 pointer-events-none">
+          <img src="/favicon.ico" alt="MockFlow Logo" className="w-[400px] h-[400px]" />
+        </div>
 
         <Footer />
       </div>

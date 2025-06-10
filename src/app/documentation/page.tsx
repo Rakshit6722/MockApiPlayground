@@ -3,8 +3,14 @@
 import React, { useState } from "react";
 import { Sparkles, Search, Zap, ArrowRight, Code, Terminal, Info, Copy, Check, ExternalLink, BookOpen, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { basicCode, complexCode } from "../_constants/documentation";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
 export default function DocumentationPage() {
+
+  const { isLoggedIn } = useSelector((state: RootState) => state.user)
+
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   const handleCopy = (code: string, id: string) => {
@@ -13,18 +19,6 @@ export default function DocumentationPage() {
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
-  const basicCode = `fetch('https://mockapi.yourusername.com/products')
-  .then(res => res.json())
-  .then(data => console.log(data));`;
-
-  const complexCode = `// Get page 1 with 5 items per page and include metadata
-fetch('https://mockapi.yourusername.com/products?page=1&limit=5&_meta=true')
-  .then(res => res.json())
-  .then(data => {
-    console.log(data.meta);  // { total: 20, page: 1, limit: 5, totalPages: 4 }
-    console.log(data.data);  // Array of 5 items
-  });`;
-
   return (
     <div className="min-h-screen bg-gray-950 flex">
       {/* Sidebar Navigation */}
@@ -32,8 +26,13 @@ fetch('https://mockapi.yourusername.com/products?page=1&limit=5&_meta=true')
         <div className="h-full flex flex-col">
           <div className="p-5 border-b border-gray-800">
             <Link href="/" className="flex items-center gap-2">
-              <Sparkles size={20} className="text-blue-500" />
-              <span className="font-bold text-white">Mock API Playground</span>
+              {/* MockFlow logo and branding */}
+              <div className="flex items-center bg-gradient-to-r from-gray-800 to-black py-1.5 px-3 rounded-md border border-neutral-700 shadow-md">
+                <img src="/favicon.ico" alt="MockFlow Logo" className="w-5 h-5 mr-2" />
+                <span className="font-bold text-lg tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-100">
+                  MockFlow
+                </span>
+              </div>
             </Link>
           </div>
 
@@ -71,17 +70,29 @@ fetch('https://mockapi.yourusername.com/products?page=1&limit=5&_meta=true')
       {/* Main Content */}
       <main className="flex-1 px-4 py-8 md:py-12 md:px-8 lg:px-12 max-w-5xl mx-auto">
         <div className="flex items-center gap-2 mb-2 text-sm text-gray-500">
-          <Link href="/dashboard" className="hover:text-gray-300">Dashboard</Link>
-          <ChevronRight size={14} />
+          {
+            isLoggedIn ? (
+              <>
+                <Link href="/dashboard" className="hover:text-gray-300">Dashboard</Link>
+                <ChevronRight size={14} />
+              </>
+            ) : (
+              <>
+                <Link href="/" className="hover:text-gray-300">Home</Link>
+                <ChevronRight size={14} />
+              </>
+
+            )
+          }
           <span className="text-gray-300">Documentation</span>
         </div>
 
         <div className="mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4" id="overview">
-            API Documentation
+          <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-100 mb-4" id="overview">
+            MockFlow Documentation
           </h1>
           <p className="text-lg text-gray-400 max-w-3xl">
-            Learn how to use your mock API endpoints with this comprehensive guide.
+            Learn how to use your MockFlow API endpoints with this comprehensive guide.
           </p>
         </div>
 
@@ -116,7 +127,7 @@ fetch('https://mockapi.yourusername.com/products?page=1&limit=5&_meta=true')
           </h2>
 
           <p className="text-gray-400 mb-6">
-            The Mock API Playground makes it simple to create and use mock endpoints for your frontend development.
+            MockFlow makes it simple to create and use mock endpoints for your frontend development.
           </p>
 
           <div className="bg-gray-900 rounded-lg border border-gray-800 overflow-hidden shadow-sm mb-6">
@@ -158,7 +169,7 @@ fetch('https://mockapi.yourusername.com/products?page=1&limit=5&_meta=true')
           </h2>
 
           <p className="text-gray-400 mb-6">
-            Enhance your mock API requests with these supported query parameters:
+            Enhance your MockFlow API requests with these supported query parameters:
           </p>
 
           <div className="bg-gray-900 rounded-lg border border-gray-800 overflow-hidden shadow-sm">
@@ -273,7 +284,7 @@ fetch('https://mockapi.yourusername.com/products?page=1&limit=5&_meta=true')
 
         {/* Coming Soon */}
         <div className="bg-gray-900 rounded-lg border border-gray-800 p-6 text-center">
-          <h2 className="text-lg font-semibold text-white mb-4">Coming Soon</h2>
+          <h2 className="text-lg font-semibold text-white mb-4">Coming Soon to MockFlow</h2>
 
           <div className="flex flex-wrap justify-center gap-3 mb-4">
             <span className="bg-gray-800 border border-gray-700 px-3 py-1 rounded-md text-gray-300 text-sm">

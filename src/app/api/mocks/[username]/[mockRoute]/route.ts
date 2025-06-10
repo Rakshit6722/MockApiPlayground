@@ -58,7 +58,7 @@ export async function GET(
 
         // Handle filtering by keyField if response is array
         if (mock.isArray && Array.isArray(response) && mock.keyField) {
-            const filterValue = searchParams.get(mock.keyField);
+            const filterValue = searchParams.get(mock.keyField) || searchParams.get('id');
             if (filterValue) {
                 response = response.filter((item: any) => 
                     String(item[mock.keyField]) === filterValue
