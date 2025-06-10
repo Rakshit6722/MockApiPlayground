@@ -1,9 +1,21 @@
 import { User } from "@/models/User";
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
+import { connectToDb } from "@/lib/mongoose";
 
 export async function POST(req: NextRequest) {
     try {
+
+        try {
+            await connectToDb();
+        } catch (err: any) {
+            console.error("Error in POST /api/auth/verify-reset-token:", err);
+            return NextResponse.json(
+                { error: "Error connecting to DB" },
+                { status: 500 }
+            );
+        }
+
         const body = await req.json();
         const { token, email } = body;
 

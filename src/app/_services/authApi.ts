@@ -71,7 +71,7 @@ export async function forgotPassword(email: string) {
             false
         )
 
-        throw response?.data
+        return response
     } catch (err: any) {
         throw new Error(err?.message ?? "Internal server error");
     }

@@ -1,8 +1,20 @@
+import { connectToDb } from "@/lib/mongoose";
 import { BlackListToken } from "@/models/Token";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
     try {
+
+        try {
+            await connectToDb();
+        } catch (err: any) {
+            console.error("Error in POST /api/auth/validate-token:", err);
+            return NextResponse.json(
+                { error: "Error connecting to DB" },
+                { status: 500 }
+            );
+        }
+
         const body = await req.json();
         const { jti } = body
 

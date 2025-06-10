@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Mock Api Playground",
-  description: "Mock API Playground is a tool for creating and testing mock APIs quickly and easily.",
+  title: "MockFlow",
+  description: "MockFlow is a tool for creating and testing mock APIs quickly and easily.",
   icons:{
     icon: "/favicon.ico",
   }

@@ -1,9 +1,21 @@
+import { connectToDb } from "@/lib/mongoose";
 import { BlackListToken } from "@/models/Token";
 import { jwtVerify } from "jose";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
     try {
+
+        try{
+            await connectToDb()
+        }catch(err: any){
+            console.error("Error in GET /api/auth/logout:", err);
+            return NextResponse.json(
+                { error: "Error connecting to DB" },
+                { status: 500 }
+            );
+        }
+
         const authHeader = req.headers.get('Authorization');
 
         if (!authHeader?.startsWith('Bearer ')) {

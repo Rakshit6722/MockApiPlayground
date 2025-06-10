@@ -2,49 +2,59 @@ import { User } from "@/models/User";
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { sendEmail } from "@/utils/email";
+import { connectToDb } from "@/lib/mongoose";
 
 export async function POST(req: NextRequest) {
+  try {
     try {
-        const body = await req.json()
-        const { email } = body;
+      await connectToDb()
+    } catch (err: any) {
+      console.error("Error in POST /api/auth/forgot-password:", err);
+      return NextResponse.json(
+        { error: "error connecting to DB" },
+        { status: 500 }
+      )
+    }
+    const body = await req.json()
+    const { email } = body;
 
-        if (!email) {
-            return NextResponse.json(
-                { error: "Email is required" },
-                { status: 400 }
-            )
-        }
+    if (!email) {
+      return NextResponse.json(
+        { error: "Email is required" },
+        { status: 400 }
+      )
+    }
 
-        console.log("Received email for password reset:", email);
+    console.log("Received email for password reset:", email);
 
-        const user = await User.findOne({
-            email: email
-        })
+    const user = await User.findOne({
+      email: email
+    })
 
-        if (!user) {
-            return NextResponse.json(
-                { error: "User not found" },
-                { status: 404 }
-            )
-        }
+    if (!user) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      )
+    }
 
-        const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetToken = crypto.randomBytes(32).toString('hex');
 
-        const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
 
-        const tokenExpiry = new Date(Date.now() + 60 * 60 * 1000);
+    const tokenExpiry = new Date(Date.now() + 60 * 60 * 1000);
 
-        user.resetToken = hashedToken;
-        user.resetTokenExpiration = tokenExpiry;
-        await user.save();
+    user.resetToken = hashedToken;
+    user.resetTokenExpiration = tokenExpiry;
+    await user.save();
 
-        const resetLink = `${process.env.PUBLIC_APP_URL}/auth/reset-password?token=${resetToken}&email=${email}`;
+    const resetLink = `${process.env.PUBLIC_APP_URL}/auth/reset-password?token=${resetToken}&email=${email}`;
 
-        await sendEmail({
-            to: user.email,
-            subject: "Password Reset Request",
-            text: `You requested a password reset. Click the link below to reset your password:\n\n${resetLink}\n\nIf you did not request this, please ignore this email.`,
-            html: `<!DOCTYPE html>
+    await sendEmail({
+      to: user.email,
+      subject: "Password Reset Request",
+      text: `You requested a password reset. Click the link below to reset your password:\n\n${resetLink}\n\nIf you did not request this, please ignore this email.`,
+      html: `<!DOCTYPE html>
             <html>
             <head>
               <meta charset="utf-8">
@@ -102,18 +112,18 @@ export async function POST(req: NextRequest) {
               </table>
             </body>
             </html>`
-        })
+    })
 
-        return NextResponse.json(
-            { message: "Password reset link sent to your email" },
-            { status: 200 }
-        )
+    return NextResponse.json(
+      { message: "Password reset link sent to your email" },
+      { status: 200 }
+    )
 
-    } catch (err: any) {
-        console.error("Error in POST /api/auth/forgot-password:", err);
-        return NextResponse.json(
-            { error: "Internal server error" },
-            { status: 500 }
-        )
-    }
+  } catch (err: any) {
+    console.error("Error in POST /api/auth/forgot-password:", err);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
+  }
 }
