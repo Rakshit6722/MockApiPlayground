@@ -39,7 +39,7 @@ export default function ResetPasswordPage() {
 
     const verifyToken = async () => {
       try {
-        const response = await verifyResetToken(token, email);
+        const response = await verifyResetToken(urlToken, urlEmail);
         if (response.status !== 200) {
           throw new Error('Invalid token');
         }
