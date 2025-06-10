@@ -86,7 +86,7 @@ export async function verifyResetToken(token: string, email: string) {
             null,
             false
         )
-        return response?.data
+        return response
     } catch (err: any) {
         throw new Error(err?.message ?? "Internal server error");
     }
