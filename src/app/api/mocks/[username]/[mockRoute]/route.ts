@@ -22,7 +22,7 @@ export async function GET(
         const user = await User.findOne({ username });
         if (!user) {
             return NextResponse.json(
-                { error: "User not found" },
+                { success: false, data: null, message: "User not found" },
                 { status: 404 }
             );
         }
@@ -33,7 +33,7 @@ export async function GET(
         });
         if (!mock) {
             return NextResponse.json(
-                { error: "Mock not found" },
+                { success: false, data: null, message: "Mock not found" },
                 { status: 404 }
             );
         }
@@ -41,8 +41,8 @@ export async function GET(
         // Handle simulated error
         if (simulateError) {
             return NextResponse.json(
-                { error: 'Simulated error response' },
-                { status: mock.status || 500 }
+                { success: false, data: null, message: 'Simulated error response' },
+                { status: 500 }
             );
         }
 
@@ -66,7 +66,10 @@ export async function GET(
                 
                 // Return single object if only one result
                 if (response.length === 1) {
-                    return NextResponse.json(response[0], { status: mock.status || 200 });
+                    return NextResponse.json(
+                        { success: true, data: response[0], message: "Fetched successfully" },
+                        { status: mock.status || 200 }
+                    );
                 }
             }
         }
@@ -81,13 +84,15 @@ export async function GET(
             // Add pagination metadata if _meta=true
             if (searchParams.get('_meta') === 'true') {
                 const paginatedResponse = {
+                    success: true,
                     data: response.slice(startIndex, endIndex),
                     meta: {
                         total: response.length,
                         page: pageNum,
                         limit: limitNum,
                         totalPages: Math.ceil(response.length / limitNum)
-                    }
+                    },
+                    message: "Fetched successfully"
                 };
                 return NextResponse.json(paginatedResponse, { status: mock.status || 200 });
             }
@@ -96,13 +101,13 @@ export async function GET(
         }
 
         return NextResponse.json(
-            response,
+            { success: true, data: response, message: "Fetched successfully" },
             { status: mock.status || 200 }
         );
     } catch (error: any) {
         console.error("Error in GET /api/mocks/[username]/[mockRoute]:", error);
         return NextResponse.json(
-            { error: "Internal server error" },
+            { success: false, data: null, message: "Internal server error" },
             { status: 500 }
         );
     }
