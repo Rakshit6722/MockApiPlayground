@@ -101,7 +101,7 @@ export async function resetPassword(token: string, email: string, newPassword: s
             null,
             false
         )
-        return response?.data
+        return response
     } catch (err: any) {
         throw new Error(err?.message ?? "Internal server error");
     }
