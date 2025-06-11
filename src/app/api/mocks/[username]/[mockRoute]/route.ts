@@ -1,4 +1,3 @@
-import cors from "@/lib/cors";
 import { connectToDb } from "@/lib/mongoose";
 import { Mock } from "@/models/Mock";
 import { User } from "@/models/User";
@@ -13,7 +12,7 @@ export async function GET(
 ) {
     try {
 
-        await cors(req, res)
+        const origin = req.headers.get("origin") || "*";
 
         await connectToDb();
 
@@ -62,6 +61,8 @@ export async function GET(
         }
 
         let response = mock.response;
+        let finalResponse: any = null;
+
 
         // Handle filtering by keyField if response is array
         if (mock.isArray && Array.isArray(response) && mock.keyField) {
@@ -73,7 +74,7 @@ export async function GET(
 
                 // Return single object if only one result
                 if (response.length === 1) {
-                    return NextResponse.json(
+                    finalResponse = NextResponse.json(
                         { success: true, data: response[0], message: "Fetched successfully" },
                         { status: mock.status || 200 }
                     );
@@ -101,16 +102,22 @@ export async function GET(
                     },
                     message: "Fetched successfully"
                 };
-                return NextResponse.json(paginatedResponse, { status: mock.status || 200 });
+                finalResponse = NextResponse.json(paginatedResponse, { status: mock.status || 200 });
             }
 
             response = response.slice(startIndex, endIndex);
         }
 
-        return NextResponse.json(
+        finalResponse = NextResponse.json(
             { success: true, data: response, message: "Fetched successfully" },
             { status: mock.status || 200 }
         );
+
+        finalResponse.headers.set("Access-Control-Allow-Origin", origin);
+        finalResponse.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        finalResponse.headers.set("Access-Control-Allow-Headers", "Content-Type");
+
+        return finalResponse;
     } catch (error: any) {
         console.error("Error in GET /api/mocks/[username]/[mockRoute]:", error);
         return NextResponse.json(
