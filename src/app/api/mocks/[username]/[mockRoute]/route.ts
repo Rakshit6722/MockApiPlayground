@@ -1,3 +1,4 @@
+import cors from "@/lib/cors";
 import { connectToDb } from "@/lib/mongoose";
 import { Mock } from "@/models/Mock";
 import { User } from "@/models/User";
@@ -5,9 +6,15 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
     req: NextRequest,
-    context: { params: { username: string; mockRoute: string } }
+    context: {
+        params: { username: string; mockRoute: string },
+    },
+    res: NextResponse
 ) {
     try {
+
+        await cors(req, res)
+
         await connectToDb();
 
         const { username, mockRoute } = context.params;
@@ -60,10 +67,10 @@ export async function GET(
         if (mock.isArray && Array.isArray(response) && mock.keyField) {
             const filterValue = searchParams.get(mock.keyField) || searchParams.get('id');
             if (filterValue) {
-                response = response.filter((item: any) => 
+                response = response.filter((item: any) =>
                     String(item[mock.keyField]) === filterValue
                 );
-                
+
                 // Return single object if only one result
                 if (response.length === 1) {
                     return NextResponse.json(
@@ -80,7 +87,7 @@ export async function GET(
             const limitNum = parseInt(limit || '10', 10);
             const startIndex = (pageNum - 1) * limitNum;
             const endIndex = startIndex + limitNum;
-            
+
             // Add pagination metadata if _meta=true
             if (searchParams.get('_meta') === 'true') {
                 const paginatedResponse = {
@@ -96,7 +103,7 @@ export async function GET(
                 };
                 return NextResponse.json(paginatedResponse, { status: mock.status || 200 });
             }
-            
+
             response = response.slice(startIndex, endIndex);
         }
 
