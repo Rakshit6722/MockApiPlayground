@@ -10,6 +10,7 @@ import { RootState } from "./redux/store";
 import { useRouter } from "next/navigation";
 import AuthRoute from "./_components/_common/AuthRoute";
 import CodeBlock from "./_components/_common/CodeBlock";
+
 export default function Home() {
   const router = useRouter();
   const { isLoggedIn } = useSelector((state: RootState) => state.user);
@@ -65,20 +66,20 @@ const fetchData = async () => {
 
   return (
     <AuthRoute>
-      <div className="min-h-screen bg-black text-white overflow-x-hidden">
+      <div className="min-h-screen bg-black text-white">
         <Navbar />
 
         {/* Hero Section with Dynamic Animation */}
-        <section className="min-h-screen py-24 flex items-center relative" ref={heroRef}>
+        <section className="min-h-screen py-16 sm:py-24 flex items-center relative" ref={heroRef}>
           <motion.div
             className="absolute inset-0 pointer-events-none"
             style={{ y }}
           >
-            <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-blue-500/20 rounded-full blur-[120px]"></div>
-            <div className="absolute top-1/3 left-1/3 w-[400px] h-[400px] bg-purple-500/20 rounded-full blur-[120px]"></div>
+            <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-blue-500/20 rounded-full blur-[120px]"></div>
+            <div className="absolute top-1/3 left-1/3 w-[200px] sm:w-[400px] h-[200px] sm:h-[400px] bg-purple-500/20 rounded-full blur-[120px]"></div>
           </motion.div>
 
-          <div className="container mx-auto px-6 relative z-10">
+          <div className="container mx-auto px-4 sm:px-6 relative z-10">
             <motion.div
               className="max-w-3xl mx-auto"
               initial={{ opacity: 0 }}
@@ -96,7 +97,7 @@ const fetchData = async () => {
               </motion.div>
 
               <motion.h1
-                className="text-4xl md:text-7xl font-bold  tracking-tight text-center pb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 font-heading"
+                className="text-3xl sm:text-4xl md:text-7xl font-bold tracking-tight text-center pb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 font-heading"
                 initial={{ opacity: 0, y: 10 }}
                 animate={heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
                 transition={{ delay: 0.3 }}
@@ -105,7 +106,7 @@ const fetchData = async () => {
               </motion.h1>
 
               <motion.p
-                className="text-neutral-400 text-xl mb-10 leading-relaxed text-center font-body"
+                className="text-base sm:text-lg md:text-xl mb-10 leading-relaxed text-center text-neutral-400 font-body px-4 sm:px-0"
                 initial={{ opacity: 0, y: 10 }}
                 animate={heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
                 transition={{ delay: 0.4 }}
@@ -123,29 +124,23 @@ const fetchData = async () => {
               >
                 <Link
                   href="/auth/signup"
-                  className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-all shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 hover:translate-y-[-2px]"
+                  className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-all shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 hover:translate-y-[-2px] w-full sm:w-auto justify-center sm:justify-start"
                 >
-                  Get started <ArrowRight size={16} />
+                  Get started <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform sm:text-xl" />
                 </Link>
-                {/* <Link
-                  href="/dashboard"
-                  className="bg-neutral-800 hover:bg-neutral-700 px-6 py-3 rounded-lg font-medium transition-all hover:translate-y-[-2px]"
-                >
-                  View demo
-                </Link> */}
               </motion.div>
             </motion.div>
 
             {/* Floating API Response Demo */}
             <motion.div
-              className="mt-16 mx-auto max-w-4xl relative"
+              className="mt-10 sm:mt-16 mx-auto w-full max-w-full sm:max-w-4xl relative px-2"
               initial={{ opacity: 0, y: 30 }}
               animate={heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
               transition={{ delay: 0.7, duration: 0.8 }}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl blur-xl"></div>
               <div className="relative bg-gray-900 rounded-xl border border-gray-800 shadow-2xl overflow-hidden">
-                <div className="flex items-center justify-between bg-gray-800 px-4 py-2 border-b border-gray-700">
+                <div className="flex flex-col sm:flex-row items-center justify-between bg-gray-800 px-4 py-2 border-b border-gray-700 gap-2">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                     <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
@@ -154,10 +149,10 @@ const fetchData = async () => {
                   <div className="text-gray-400 text-xs font-mono px-2 py-1 bg-gray-700/50 rounded">
                     GET /api/products
                   </div>
-                  <div></div>
+                  <div className="hidden sm:block"></div>
                 </div>
-                <div className="p-4 font-mono text-sm text-green-400 overflow-x-auto max-h-[300px]">
-                  <pre className="whitespace-pre">{`[
+                <div className="p-2 sm:p-4 font-mono text-xs sm:text-sm text-green-400 max-h-[300px] overflow-x-auto">
+                  <pre className="whitespace-pre-wrap break-words">{`[
   {
     "id": 1,
     "name": "Quantum X1 Headphones",
@@ -192,7 +187,7 @@ const fetchData = async () => {
 
           {/* Scroll indicator */}
           <motion.div
-            className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+            className="absolute bottom-8 left-1/2 transform -translate-x-1/2 hidden sm:block"
             animate={{ y: [0, 10, 0] }}
             transition={{ repeat: Infinity, duration: 2 }}
           >
@@ -207,27 +202,27 @@ const fetchData = async () => {
         </section>
 
         {/* Developer Story Section - Improved Styling */}
-        <section className="py-32 relative overflow-hidden" ref={storyRef}>
+        <section className="py-16 sm:py-32 relative overflow-hidden" ref={storyRef}>
           {/* Background accent */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
             <div className="absolute -top-[300px] -right-[300px] w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[120px]"></div>
             <div className="absolute -bottom-[300px] -left-[300px] w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-[120px]"></div>
           </div>
 
-          <div className="container mx-auto px-6 relative z-10">
+          <div className="container mx-auto px-4 sm:px-6 relative z-10">
             <motion.div 
-              className="text-center mb-20"
+              className="text-center mb-12 sm:mb-20"
               initial={{ opacity: 0, y: 20 }}
               animate={storyInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             >
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight font-heading">The Developer's Dilemma</h2>
-              <p className="text-xl text-neutral-400 max-w-2xl mx-auto leading-relaxed">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 tracking-tight font-heading">The Developer's Dilemma</h2>
+              <p className="text-lg sm:text-xl text-neutral-400 max-w-2xl mx-auto leading-relaxed px-2">
                 Every frontend developer knows the pain of waiting for backend APIs.
                 Here's how we solve it.
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 gap-16 items-start max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-start max-w-6xl mx-auto">
               {/* Left Column - Without Mock API */}
               <motion.div
                 initial={{ opacity: 0, x: -50 }}
@@ -235,21 +230,23 @@ const fetchData = async () => {
                 transition={{ delay: 0.2 }}
                 className="flex flex-col h-full"
               >
-                <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-8 mb-10 shadow-xl relative h-full">
-                  <div className="absolute -top-3 -left-3 px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg flex items-center gap-2">
-                    <X size={18} className="text-red-400" />
-                    <h3 className="text-xl font-semibold text-red-300">Without Mock API</h3>
+                <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 sm:p-8 mb-6 sm:mb-10 shadow-xl relative h-full">
+                  <div className="absolute -top-3 -left-3 px-3 sm:px-4 py-1 sm:py-2 bg-red-500/20 border border-red-500/30 rounded-lg flex items-center gap-2">
+                    <X size={16} className="text-red-400" />
+                    <h3 className="text-lg sm:text-xl font-semibold text-red-300">Without Mock API</h3>
                   </div>
-                  <div className="bg-neutral-800/70 rounded-lg p-6 mt-8 backdrop-blur-sm border border-neutral-700/50 font-mono">
-                    <CodeBlock code={beforeCode} language="javascript" />
+                  <div className="bg-neutral-800/70 rounded-lg p-3 sm:p-6 mt-6 sm:mt-8 backdrop-blur-sm border border-neutral-700/50 font-mono">
+                    <div className="overflow-x-auto">
+                      <CodeBlock code={beforeCode} language="javascript" />
+                    </div>
                   </div>
-                  <div className="mt-6 flex items-center gap-3 text-neutral-400 border-t border-neutral-800 pt-6">
+                  <div className="mt-4 sm:mt-6 flex items-center gap-3 text-neutral-400 border-t border-neutral-800 pt-4 sm:pt-6">
                     <Clock size={18} />
                     <span className="text-sm">Development blocked, waiting for backend</span>
                   </div>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-6">
                   <motion.div 
                     className="flex items-start gap-5"
                     initial={{ opacity: 0, y: 20 }}
@@ -304,21 +301,23 @@ const fetchData = async () => {
                 transition={{ delay: 0.4 }}
                 className="flex flex-col h-full"
               >
-                <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-8 mb-10 shadow-xl relative h-full">
-                  <div className="absolute -top-3 -left-3 px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-lg flex items-center gap-2">
-                    <Check size={18} className="text-green-400" />
-                    <h3 className="text-xl font-semibold text-green-300">With Mock API Playground</h3>
+                <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 sm:p-8 mb-6 sm:mb-10 shadow-xl relative h-full">
+                  <div className="absolute -top-3 -left-3 px-3 sm:px-4 py-1 sm:py-2 bg-green-500/20 border border-green-500/30 rounded-lg flex items-center gap-2">
+                    <Check size={16} className="text-green-400" />
+                    <h3 className="text-lg sm:text-xl font-semibold text-green-300">With Mock API Playground</h3>
                   </div>
-                  <div className="bg-neutral-800/70 rounded-lg p-6 mt-8 backdrop-blur-sm border border-neutral-700/50 font-mono">
-                    <CodeBlock code={afterCode} language="javascript" />
+                  <div className="bg-neutral-800/70 rounded-lg p-3 sm:p-6 mt-6 sm:mt-8 backdrop-blur-sm border border-neutral-700/50 font-mono">
+                    <div className="overflow-x-auto">
+                      <CodeBlock code={afterCode} language="javascript" />
+                    </div>
                   </div>
-                  <div className="mt-6 flex items-center gap-3 text-green-400 border-t border-neutral-800 pt-6">
+                  <div className="mt-4 sm:mt-6 flex items-center gap-3 text-green-400 border-t border-neutral-800 pt-4 sm:pt-6">
                     <PlayCircle size={18} />
                     <span className="text-sm">Development continues unblocked</span>
                   </div>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-6">
                   <motion.div 
                     className="flex items-start gap-5"
                     initial={{ opacity: 0, y: 20 }}
@@ -369,60 +368,92 @@ const fetchData = async () => {
           </div>
         </section>
 
-        {/* Development Timeline */}
-        <section className="py-24 bg-gradient-to-b from-black to-gray-900">
-          <div className="container mx-auto px-6">
-            <h2 className="text-3xl md:text-4xl font-bold mb-16 text-center">The Developer Journey</h2>
+        {/* Development Timeline - Mobile Responsive */}
+        <section className="py-16 sm:py-24 bg-gradient-to-b from-black to-gray-900">
+          <div className="container mx-auto px-4 sm:px-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-10 sm:mb-16 text-center">The Developer Journey</h2>
 
             <div className="relative">
-              {/* Timeline connector */}
-              <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-blue-700/30 transform -translate-x-1/2"></div>
+              {/* Timeline connector - Hide on mobile, show on larger screens */}
+              <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-blue-700/30 transform -translate-x-1/2 hidden md:block"></div>
 
-              {/* Timeline steps */}
-              {timelineSteps.map((step, index) => (
-                <motion.div
-                  key={index}
-                  className={`flex items-center mb-20 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                >
-                  <div className={`w-1/2 px-4 ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
-                    <h3 className="text-xl font-bold mb-2">{step.title}</h3>
-                    <p className="text-neutral-400">{step.description}</p>
-                  </div>
-
-                  <div className="relative z-10 flex-shrink-0">
-                    <div className="w-12 h-12 rounded-full bg-blue-600 border-4 border-black flex items-center justify-center shadow-lg shadow-blue-500/30">
-                      <span className="font-bold">{index + 1}</span>
+              {/* Mobile timeline - vertical with left alignment */}
+              <div className="md:hidden">
+                {timelineSteps.map((step, index) => (
+                  <motion.div
+                    key={index}
+                    className="flex flex-col mb-10 relative"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                  >
+                    {/* Left timeline line */}
+                    <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-blue-700/30"></div>
+                    
+                    {/* Circle with number */}
+                    <div className="z-10 flex-shrink-0 mb-4">
+                      <div className="w-12 h-12 rounded-full bg-blue-600 border-4 border-black flex items-center justify-center shadow-lg shadow-blue-500/30">
+                        <span className="font-bold">{index + 1}</span>
+                      </div>
                     </div>
-                    <div className="absolute top-0 left-0 right-0 bottom-0 rounded-full bg-blue-600 opacity-40 animate-ping"></div>
-                  </div>
+                    
+                    {/* Content */}
+                    <div className="ml-4">
+                      <h3 className="text-lg font-bold mb-2">{step.title}</h3>
+                      <p className="text-neutral-400">{step.description}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
 
-                  <div className="w-1/2 px-4"></div>
-                </motion.div>
-              ))}
+              {/* Desktop timeline - alternating sides */}
+              <div className="hidden md:block">
+                {timelineSteps.map((step, index) => (
+                  <motion.div
+                    key={index}
+                    className={`flex items-center mb-20 ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                  >
+                    <div className={`w-1/2 px-4 ${index % 2 === 0 ? 'text-right' : 'text-left'}`}>
+                      <h3 className="text-xl font-bold mb-2">{step.title}</h3>
+                      <p className="text-neutral-400">{step.description}</p>
+                    </div>
+
+                    <div className="relative z-10 flex-shrink-0">
+                      <div className="w-12 h-12 rounded-full bg-blue-600 border-4 border-black flex items-center justify-center shadow-lg shadow-blue-500/30">
+                        <span className="font-bold">{index + 1}</span>
+                      </div>
+                      <div className="absolute top-0 left-0 right-0 bottom-0 rounded-full bg-blue-600 opacity-40 animate-ping"></div>
+                    </div>
+
+                    <div className="w-1/2 px-4"></div>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
         {/* Features with Scroll Animation */}
-        <section className="py-24 relative" ref={featureRef}>
-          <div className="container mx-auto px-6">
+        <section className="py-16 sm:py-24 relative" ref={featureRef}>
+          <div className="container mx-auto px-4 sm:px-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={featureInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.5 }}
-              className="text-center mb-16"
+              className="text-center mb-10 sm:mb-16"
             >
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Designed for Developers</h2>
-              <p className="text-xl text-neutral-400 max-w-2xl mx-auto">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">Designed for Developers</h2>
+              <p className="text-lg sm:text-xl text-neutral-400 max-w-2xl mx-auto px-2">
                 Everything you need to create realistic APIs without writing a single line of backend code
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
               {[
                 {
                   icon: <Code className="w-6 h-6 text-cyan-500" />,
@@ -445,56 +476,25 @@ const fetchData = async () => {
               ].map((feature, index) => (
                 <motion.div
                   key={index}
-                  className="bg-neutral-900 p-8 rounded-xl border border-neutral-800 group hover:border-blue-900/40 transition-all"
+                  className="bg-neutral-900 p-6 sm:p-8 rounded-xl border border-neutral-800 group hover:border-blue-900/40 transition-all"
                   initial={{ opacity: 0, y: 30 }}
                   animate={featureInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   whileHover={{ y: -5, transition: { duration: 0.2 } }}
                 >
-                  <div className={`w-16 h-16 bg-${feature.color}-500/20 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                  <div className={`w-14 h-14 sm:w-16 sm:h-16 bg-${feature.color}-500/20 rounded-lg flex items-center justify-center mb-5 sm:mb-6 group-hover:scale-110 transition-transform`}>
                     {feature.icon}
                   </div>
-                  <h3 className="text-xl font-semibold mb-3 font-heading">{feature.title}</h3>
-                  <p className="text-neutral-400 font-body">{feature.description}</p>
+                  <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 font-heading">{feature.title}</h3>
+                  <p className="text-sm sm:text-base text-neutral-400 font-body">{feature.description}</p>
                 </motion.div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Interactive Demo Section */}
-        {/* <section className="py-24 bg-gradient-to-b from-gray-900 to-black" ref={demoRef}>
-          <div className="container mx-auto px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={demoInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              className="max-w-3xl mx-auto text-center mb-16"
-            >
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">See it in action</h2>
-              <p className="text-xl text-neutral-400">
-                Watch how quickly you can create and use mock APIs for your projects
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={demoInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="relative mx-auto max-w-4xl overflow-hidden rounded-xl border border-gray-800 shadow-2xl"
-            >
-              <div className="aspect-video bg-gray-900 flex items-center justify-center">
-                <div className="text-center">
-                  <PlayCircle size={80} className="text-blue-500 mx-auto mb-4 hover:text-blue-400 cursor-pointer transition-colors" />
-                  <p className="text-xl font-medium">Watch the 2-minute demo</p>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </section> */}
-
-
-        {/* Final CTA - Modern Redesign */}
-        <section className="py-32 relative overflow-hidden">
+        {/* Final CTA - Mobile Responsive */}
+        <section className="py-16 sm:py-32 relative overflow-hidden">
           {/* Modern animated gradient background */}
           <div className="absolute inset-0 w-full h-full">
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-600/10 via-indigo-500/5 to-purple-600/10 animate-gradient-slow"></div>
@@ -502,14 +502,14 @@ const fetchData = async () => {
             <div className="absolute -bottom-[20%] -left-[10%] w-[60%] h-[60%] rounded-full bg-purple-500/10 blur-[100px] animate-pulse-slow animation-delay-2000"></div>
           </div>
           
-          {/* Decorative elements */}
-          <div className="absolute inset-0 opacity-30">
+          {/* Decorative elements - hidden on smallest screens */}
+          <div className="absolute inset-0 opacity-30 hidden sm:block">
             <div className="absolute top-[10%] left-[15%] w-1 h-1 bg-blue-400 rounded-full animate-ping-slow"></div>
             <div className="absolute top-[30%] right-[25%] w-2 h-2 bg-purple-400 rounded-full animate-ping-slow animation-delay-1000"></div>
             <div className="absolute bottom-[20%] left-[35%] w-1.5 h-1.5 bg-indigo-400 rounded-full animate-ping-slow animation-delay-3000"></div>
           </div>
 
-          <div className="container mx-auto px-6 relative z-10">
+          <div className="container mx-auto px-4 sm:px-6 relative z-10">
             <div className="relative max-w-5xl mx-auto">
               {/* Glass card */}
               <motion.div
@@ -519,15 +519,15 @@ const fetchData = async () => {
                 viewport={{ once: true }}
                 className="backdrop-blur-xl bg-white/[0.01] border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
               >
-                <div className="md:flex items-stretch">
+                <div className="flex flex-col md:flex-row items-stretch">
                   {/* Content side */}
-                  <div className="md:w-2/3 p-12 md:p-16">
+                  <div className="w-full md:w-2/3 p-6 sm:p-12 md:p-16">
                     <motion.h2 
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.1, duration: 0.5 }}
                       viewport={{ once: true }}
-                      className="text-5xl md:text-6xl font-bold tracking-tight font-heading bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-100 to-blue-200"
+                      className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight font-heading bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-100 to-blue-200"
                     >
                       Ready to accelerate your workflow?
                     </motion.h2>
@@ -537,7 +537,7 @@ const fetchData = async () => {
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2, duration: 0.5 }}
                       viewport={{ once: true }}
-                      className="text-xl text-white/70 mt-6 mb-10 leading-relaxed max-w-xl"
+                      className="text-base sm:text-lg md:text-xl text-white/70 mt-4 sm:mt-6 mb-6 sm:mb-10 leading-relaxed max-w-xl"
                     >
                       Join thousands of developers who've transformed their development process with Mock API Playground.
                     </motion.p>
@@ -551,19 +551,18 @@ const fetchData = async () => {
                     >
                       <Link
                         href="/auth/signup"
-                        className="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-4 rounded-xl font-medium text-lg shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-300"
+                        className="w-full sm:w-auto text-center group relative overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-medium text-base sm:text-lg shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-300"
                       >
-                        <span className="relative z-10 flex items-center gap-2">
-                          Start building now <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                        <span className="relative z-10 flex items-center justify-center sm:justify-start gap-2">
+                          Start building now <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform sm:text-xl" />
                         </span>
                         <span className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-blue-600 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
                       </Link>
-                    
                     </motion.div>
                   </div>
                   
-                  {/* Visual side */}
-                  <div className="md:w-1/3 bg-gradient-to-br from-blue-600/20 to-indigo-600/20 relative hidden md:block">
+                  {/* Visual side - hidden on mobile */}
+                  <div className="w-full md:w-1/3 bg-gradient-to-br from-blue-600/20 to-indigo-600/20 relative hidden md:block">
                     <div className="absolute inset-0 flex items-center justify-center">
                       <motion.div 
                         initial={{ opacity: 0, scale: 0.9 }}
@@ -604,13 +603,12 @@ const fetchData = async () => {
                   </div>
                 </div>
               </motion.div>
-              
             </div>
           </div>
         </section>
 
         <div className="absolute top-20 left-1/2 -translate-x-1/2 transform opacity-10 pointer-events-none">
-          <img src="/favicon.ico" alt="MockFlow Logo" className="w-[400px] h-[400px]" />
+          <img src="/favicon.ico" alt="MockFlow Logo" className="w-[200px] h-[200px] sm:w-[400px] sm:h-[400px]" />
         </div>
 
         <Footer />

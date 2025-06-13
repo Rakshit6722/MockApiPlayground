@@ -98,23 +98,24 @@ export default function DocumentationPage() {
 
         {/* Status Card */}
         <div className="bg-gray-900 rounded-lg border border-gray-800 p-5 mb-10 shadow-sm">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <div className="text-gray-300 flex items-center gap-2 mb-1">
-                <Zap className="text-yellow-500" size={18} />
-                <span className="font-medium">Current Status:</span> Only <b>GET</b> requests are available right now
-              </div>
-              <div className="text-gray-500 text-sm flex items-center gap-2">
-                <Info size={14} />
-                More HTTP methods coming in future updates
-              </div>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-1">
+            <div className="text-gray-300 flex items-center gap-2">
+              <Zap className="text-yellow-500" size={18} />
+              <span className="font-medium">Current Status:</span>
+              <span>
+                Only <b>GET</b> requests are available right now
+              </span>
             </div>
+            <div className="text-gray-500 text-sm flex items-center gap-2">
+              <Info size={14} />
+              <span>More HTTP methods coming in future updates</span>
+            </div>
+          </div>
 
-            <div className="rounded-md bg-gray-800 border border-gray-700 px-3 py-1.5">
-              <div className="flex items-center gap-2 text-xs">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-green-400 font-medium">API Online</span>
-              </div>
+          <div className="rounded-md bg-gray-800 border border-gray-700 px-3 py-1.5">
+            <div className="flex items-center gap-2 text-xs">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span className="text-green-400 font-medium">API Online</span>
             </div>
           </div>
         </div>
@@ -264,8 +265,8 @@ export default function DocumentationPage() {
                 }
               </button>
             </div>
-            <div className="bg-gray-950 overflow-hidden">
-              <pre className="p-4 overflow-x-auto text-sm">
+            <div className="bg-gray-950 code-scroll min-w-0">
+              <pre className="p-4 text-sm whitespace-pre">
                 <code className="font-mono text-blue-100">{complexCode}</code>
               </pre>
             </div>
