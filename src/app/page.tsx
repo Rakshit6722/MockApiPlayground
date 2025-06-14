@@ -295,6 +295,7 @@ const fetchData = async () => {
               </motion.div>
 
               {/* Right Column - With Mock API */}
+              
               <motion.div
                 initial={{ opacity: 0, x: 50 }}
                 animate={storyInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
