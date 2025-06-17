@@ -47,5 +47,6 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: [
     '/api/mock/:path*',
+    '/api/create-mock-auth/:path*',
   ]
 }

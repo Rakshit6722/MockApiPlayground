@@ -2,6 +2,7 @@ import { connectToDb } from "@/lib/mongoose";
 import { Mock } from "@/models/Mock";
 import { User } from "@/models/User";
 import { NextRequest, NextResponse } from "next/server";
+import { MockUserData } from "@/models/MockUserData";
 
 export async function GET(
     req: NextRequest,
