@@ -27,8 +27,6 @@ interface MockAuth {
   updatedAt: string;
 }
 
-
-
 export default function MockAuthTable() {
   const router = useRouter();
   const [mockAuths, setMockAuths] = useState<MockAuth[]>([]);
@@ -266,7 +264,7 @@ export default function MockAuthTable() {
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div
-                      className="flex items-center justify-end space-x-2 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-200"
+                      className="flex items-center justify-end space-x-2 md:opacity-0 md:group-hover:opacity-100 md:translate-y-2 md:group-hover:translate-y-0 transition-all duration-200"
                     >
                       <button
                         className="text-gray-400 cursor-pointer hover:text-indigo-400 transition-colors p-1.5 rounded-full hover:bg-gray-800"

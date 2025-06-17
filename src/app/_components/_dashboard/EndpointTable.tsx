@@ -203,8 +203,10 @@ function EndpointTable({ userMocks = [], openCreateModal, handleChange }: Endpoi
 
                   <motion.div
                     className="flex items-center gap-1"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: hoveredId === mock._id ? 1 : 0 }}
+                    initial={{ opacity: 1 }} // Start visible for mobile
+                    animate={{ 
+                      opacity: hoveredId === mock._id ? 1 : window.innerWidth >= 768 ? 0 : 1 
+                    }}
                     transition={{ duration: 0.15 }}
                   >
                     <button
