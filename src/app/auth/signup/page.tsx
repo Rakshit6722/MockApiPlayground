@@ -9,6 +9,8 @@ import { registerUser } from '@/app/_services/authApi';
 import { useRouter } from 'next/navigation';
 import AuthRoute from '@/app/_components/_common/AuthRoute';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { setIsLoggedIn, setUserInfo } from '@/app/redux/slices/userSlice';
 
 const signupSchema = z.object({
     username: z.string().min(5, 'Username must be at least 5 characters'),
@@ -19,6 +21,9 @@ const signupSchema = z.object({
 type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
+
+    const dispatch = useDispatch()
+
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -39,8 +44,17 @@ export default function SignupPage() {
             if (response?.status !== 201) {
                 throw new Error(response?.data?.message || "Signup failed");
             }
+            const userInfo = response?.data
+            console.log("User info from signup:", userInfo);
+            dispatch(setUserInfo({
+                username: userInfo.user.username,
+                email: userInfo.user.email,
+                token: userInfo.user.token,
+            }))
+            localStorage.setItem('token', userInfo.token);
+            dispatch(setIsLoggedIn(true));
             toast.success("Account created successfully! Please sign in.");
-            router.push('/auth/login');
+            router.push('/dashboard');
         } catch (error: any) {
             toast.error(error?.message || "An error occurred during signup. Please try again later.");
         } finally {

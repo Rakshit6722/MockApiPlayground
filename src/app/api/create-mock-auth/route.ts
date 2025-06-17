@@ -85,7 +85,7 @@ export async function GET(req: NextRequest) {
         if (mockAuths.length === 0) {
             return NextResponse.json(
                 { success: false, data: null, message: "No mock auths found for this user" },
-                { status: 404 }
+                { status: 200 }
             );
         }
         return NextResponse.json(

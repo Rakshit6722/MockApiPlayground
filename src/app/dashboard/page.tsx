@@ -59,7 +59,7 @@ function DashboardPage() {
       setUserMocks(response);
       setStats(prev => ({
         ...prev,
-        totalApiEndpoints: response.length
+        totalApiEndpoints: response?.length || 0
       }));
     } catch (err) {
       console.error('Error fetching mocks:', err);
@@ -76,7 +76,7 @@ function DashboardPage() {
       const response = await getMockAuthRoutes(); 
       setStats(prev => ({
         ...prev,
-        totalAuthEndpoints: response.data.data.length 
+        totalAuthEndpoints: response?.data?.data?.length || 0 
       }));
     } catch (err) {
       console.error('Error fetching auth mocks:', err);
