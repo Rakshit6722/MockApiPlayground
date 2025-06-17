@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 import { User } from "@/models/User";
 import { applyCors, corsHeaders } from "@/lib/applyCors";
 
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"; // Use env var in production
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
 export async function POST(req: NextRequest, context: { params: { slug: string[] } }) {
     try {
