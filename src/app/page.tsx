@@ -1,8 +1,8 @@
 "use client";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import Link from "next/link";
-import { useRef, useEffect } from "react";
-import { ArrowRight, Clock, X, Check, Code, PlayCircle, PauseCircle, RefreshCw } from "lucide-react";
+import { useRef } from "react";
+import { ArrowRight, Code, Plus, Zap, Star, ChevronRight, Users, Clock4, GitMerge, FileCode2, Check, X } from "lucide-react";
 import Footer from "./_components/_common/Footer";
 import Navbar from "./_components/_common/Navbar";
 import { useSelector } from "react-redux";
@@ -10,6 +10,31 @@ import { RootState } from "./redux/store";
 import { useRouter } from "next/navigation";
 import AuthRoute from "./_components/_common/AuthRoute";
 import CodeBlock from "./_components/_common/CodeBlock";
+import {
+  HERO_CONTENT,
+  BEFORE_CODE,
+  AFTER_CODE,
+  PROBLEM_SECTION,
+  HOW_IT_WORKS,
+  KEY_BENEFITS,
+  TESTIMONIAL,
+  FINAL_CTA,
+  API_RESPONSE_EXAMPLE
+} from "./_constants/home";
+
+// Map string icon names to actual Lucide icon components
+const getIconComponent = (iconName: string, size: number = 24) => {
+  const icons: Record<string, JSX.Element> = {
+    Plus: <Plus size={size} />,
+    Code: <Code size={size} />,
+    Zap: <Zap size={size} />,
+    Clock4: <Clock4 size={size} />,
+    Users: <Users size={size} />,
+    GitMerge: <GitMerge size={size} />,
+    FileCode2: <FileCode2 size={size} />,
+  };
+  return icons[iconName] || null;
+};
 
 export default function Home() {
   const router = useRouter();
@@ -17,67 +42,27 @@ export default function Home() {
 
   // Refs for scroll animations
   const heroRef = useRef(null);
-  const storyRef = useRef(null);
+  const solutionRef = useRef(null);
   const featureRef = useRef(null);
-  const demoRef = useRef(null);
 
   // InView hooks for scroll-based animations
   const heroInView = useInView(heroRef, { once: false, amount: 0.3 });
-  const storyInView = useInView(storyRef, { once: false, amount: 0.3 });
+  const solutionInView = useInView(solutionRef, { once: true, amount: 0.3 });
   const featureInView = useInView(featureRef, { once: true, amount: 0.3 });
-  const demoInView = useInView(demoRef, { once: true, amount: 0.3 });
 
   // Scroll-based parallax effect
   const { scrollYProgress } = useScroll();
-  const y = useTransform(scrollYProgress, [0, 1], [0, -100]);
-
-  // Sample code snippets for the story
-  const beforeCode = `// Waiting for backend API to be completed...
-const fetchData = async () => {
-  // TODO: Implement when backend is ready
-  // const response = await fetch('/api/data');
-  // const data = await response.json();
-  
-  // Using placeholder data for now
-  return [{ id: 1, name: "Placeholder" }];
-};`;
-
-  const afterCode = `// Using Mock API Playground
-const fetchData = async () => {
-  const response = await fetch('https://mockapi.io/yourusername/products');
-  const data = await response.json();
-  return data; // Real-looking data, instantly available
-};`;
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      router.push('/dashboard');
-    }
-  }, [isLoggedIn, router]);
-
-  // Timeline states for animation sequence
-  const timelineSteps = [
-    { title: "Backend delays", description: "Your project is stuck waiting for API endpoints" },
-    { title: "Create mock API", description: "Set up realistic responses in minutes" },
-    { title: "Build your frontend", description: "Develop without backend dependencies" },
-    { title: "Test edge cases", description: "Simulate errors and edge conditions" },
-    { title: "Seamless transition", description: "Switch to real API when it's ready" }
-  ];
+  const y = useTransform(scrollYProgress, [0, 1], [0, -50]);
 
   return (
     <AuthRoute>
       <div className="min-h-screen bg-black text-white overflow-x-hidden">
         <Navbar />
 
-        {/* Hero Section with Dynamic Animation */}
+        {/* Hero Section */}
         <section className="min-h-screen py-16 sm:py-24 flex items-center relative" ref={heroRef}>
-          <motion.div
-            className="absolute inset-0 pointer-events-none"
-            style={{ y }}
-          >
-            {/* Responsive background blurs */}
+          <motion.div className="absolute inset-0 pointer-events-none" style={{ y }}>
             <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-[80vw] max-w-[600px] h-[80vw] max-h-[600px] bg-blue-500/20 rounded-full blur-[120px]"></div>
-            <div className="absolute top-1/3 left-1/3 w-[60vw] max-w-[400px] h-[60vw] max-h-[400px] bg-purple-500/20 rounded-full blur-[120px]"></div>
           </motion.div>
 
           <div className="container mx-auto px-4 sm:px-6 relative z-10">
@@ -94,7 +79,7 @@ const fetchData = async () => {
                 transition={{ delay: 0.2 }}
               >
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                Launching Beta v1.0
+                {HERO_CONTENT.badge}
               </motion.div>
 
               <motion.h1
@@ -103,7 +88,8 @@ const fetchData = async () => {
                 animate={heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
                 transition={{ delay: 0.3 }}
               >
-                Stop waiting<br />Start building<span className="text-blue-500">.</span>
+                {HERO_CONTENT.heading.split('. ')[0]}<span className="text-blue-500">.</span><br />
+                {HERO_CONTENT.heading.split('. ')[1]}<span className="text-blue-500">.</span>
               </motion.h1>
 
               <motion.p
@@ -112,9 +98,7 @@ const fetchData = async () => {
                 animate={heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
                 transition={{ delay: 0.4 }}
               >
-                Create realistic mock APIs in seconds. Build your frontend without
-                waiting for backend APIs to be ready. It's the development superpower
-                you've been waiting for.
+                {HERO_CONTENT.description}
               </motion.p>
 
               <motion.div
@@ -132,7 +116,7 @@ const fetchData = async () => {
               </motion.div>
             </motion.div>
 
-            {/* Floating API Response Demo */}
+            {/* API Response Demo */}
             <motion.div
               className="mt-10 sm:mt-16 mx-auto w-full max-w-full sm:max-w-4xl relative px-2 sm:px-0"
               initial={{ opacity: 0, y: 30 }}
@@ -153,73 +137,33 @@ const fetchData = async () => {
                   <div className="hidden sm:block"></div>
                 </div>
                 <div className="p-3 sm:p-4 font-mono text-xs sm:text-sm text-green-400 max-h-[300px] overflow-x-auto">
-                  <pre className="whitespace-pre-wrap break-words">{`[
-  {
-    "id": 1,
-    "name": "Quantum X1 Headphones",
-    "price": 299.99,
-    "category": "Audio",
-    "inStock": true,
-    "rating": 4.8,
-    "specs": {
-      "color": "Midnight Black",
-      "wireless": true,
-      "batteryLife": "40 hours"
-    }
-  },
-  {
-    "id": 2,
-    "name": "Stellar 4K Monitor",
-    "price": 549.99,
-    "category": "Display",
-    "inStock": false,
-    "rating": 4.6,
-    "specs": {
-      "size": "32 inch",
-      "resolution": "3840x2160",
-      "refreshRate": "144Hz"
-    }
-  }
-]`}</pre>
+                  <pre className="whitespace-pre-wrap break-words">{API_RESPONSE_EXAMPLE}</pre>
                 </div>
               </div>
             </motion.div>
           </div>
-
-          {/* Scroll indicator - hide on mobile */}
-          <motion.div
-            className="absolute bottom-8 left-1/2 transform -translate-x-1/2 hidden sm:block"
-            animate={{ y: [0, 10, 0] }}
-            transition={{ repeat: Infinity, duration: 2 }}
-          >
-            <div className="w-8 h-12 border-2 border-gray-400 rounded-full flex justify-center">
-              <motion.div
-                className="w-2 h-2 bg-gray-400 rounded-full mt-2"
-                animate={{ y: [0, 16, 0] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-              />
-            </div>
-          </motion.div>
         </section>
 
-        {/* Developer Story Section - Improved Styling */}
-        <section className="py-16 sm:py-32 relative overflow-hidden" ref={storyRef}>
-          {/* Background accent - responsive sizing */}
+        {/* Problem-Solution Section */}
+        <section className="py-16 sm:py-32 relative overflow-hidden" ref={solutionRef}>
           <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
             <div className="absolute -top-[30vw] -right-[30vw] w-[60vw] h-[60vw] max-w-[600px] max-h-[600px] bg-blue-500/10 rounded-full blur-[120px]"></div>
             <div className="absolute -bottom-[30vw] -left-[30vw] w-[60vw] h-[60vw] max-w-[600px] max-h-[600px] bg-purple-500/10 rounded-full blur-[120px]"></div>
           </div>
 
           <div className="container mx-auto px-4 sm:px-6 relative z-10">
-            <motion.div 
+            <motion.div
               className="text-center mb-10 sm:mb-20"
               initial={{ opacity: 0, y: 20 }}
-              animate={storyInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true, amount: 0.3 }}
             >
-              <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 sm:mb-6 tracking-tight font-heading">The Developer's Dilemma</h2>
+              <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 sm:mb-6 tracking-tight font-heading">
+                {PROBLEM_SECTION.heading}
+              </h2>
               <p className="text-base sm:text-lg md:text-xl text-neutral-400 max-w-2xl mx-auto leading-relaxed px-2">
-                Every frontend developer knows the pain of waiting for backend APIs.
-                Here's how we solve it.
+                {PROBLEM_SECTION.description}
               </p>
             </motion.div>
 
@@ -227,392 +171,227 @@ const fetchData = async () => {
               {/* Left Column - Without Mock API */}
               <motion.div
                 initial={{ opacity: 0, x: -50 }}
-                animate={storyInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
+                viewport={{ once: true, amount: 0.3 }}
                 className="flex flex-col h-full"
               >
                 <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 sm:p-8 mb-6 sm:mb-10 shadow-xl relative h-full">
                   <div className="absolute -top-3 -left-3 px-2 sm:px-4 py-1 sm:py-2 bg-red-500/20 border border-red-500/30 rounded-lg flex items-center gap-2">
                     <X size={16} className="text-red-400" />
-                    <h3 className="text-sm sm:text-xl font-semibold text-red-300">Without Mock API</h3>
+                    <h3 className="text-sm sm:text-xl font-semibold text-red-300">
+                      {PROBLEM_SECTION.without.title}
+                    </h3>
                   </div>
                   <div className="bg-neutral-800/70 rounded-lg p-3 sm:p-6 mt-6 sm:mt-8 backdrop-blur-sm border border-neutral-700/50 font-mono">
                     <div className="overflow-x-auto">
-                      <CodeBlock code={beforeCode} language="javascript" />
+                      <CodeBlock code={BEFORE_CODE} language="javascript" />
                     </div>
                   </div>
-                  <div className="mt-4 sm:mt-6 flex items-center gap-3 text-neutral-400 border-t border-neutral-800 pt-4 sm:pt-6">
-                    <Clock size={16} className="sm:text-lg" />
-                    <span className="text-xs sm:text-sm">Development blocked, waiting for backend</span>
-                  </div>
-                </div>
-
-                <div className="space-y-4 sm:space-y-6">
-                  {/* Without Mock API items - more compact on mobile */}
-                  <motion.div 
-                    className="flex items-start gap-3 sm:gap-5"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={storyInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                    transition={{ delay: 0.3 }}
-                  >
-                    <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center bg-red-500/20 text-red-400 mt-1 shadow-lg shadow-red-500/5 flex-shrink-0">
-                      <X size={18} className="sm:size-6" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-base sm:text-lg mb-1 sm:mb-2">Slow Feedback Loops</h4>
-                      <p className="text-xs sm:text-base text-neutral-400 leading-relaxed">Can't iterate quickly on UI changes while waiting for backend APIs to be implemented.</p>
-                    </div>
-                  </motion.div>
-                  
-                  <motion.div 
-                    className="flex items-start gap-3 sm:gap-5"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={storyInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                    transition={{ delay: 0.4 }}
-                  >
-                    <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center bg-red-500/20 text-red-400 mt-1 shadow-lg shadow-red-500/5 flex-shrink-0">
-                      <X size={18} className="sm:size-6" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-base sm:text-lg mb-1 sm:mb-2">Unrealistic Test Data</h4>
-                      <p className="text-xs sm:text-base text-neutral-400 leading-relaxed">Placeholder data doesn't match real API structure, causing refactoring later.</p>
-                    </div>
-                  </motion.div>
-                  
-                  <motion.div 
-                    className="flex items-start gap-3 sm:gap-5"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={storyInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                    transition={{ delay: 0.5 }}
-                  >
-                    <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center bg-red-500/20 text-red-400 mt-1 shadow-lg shadow-red-500/5 flex-shrink-0">
-                      <X size={18} className="sm:size-6" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-base sm:text-lg mb-1 sm:mb-2">Dependency Blocking</h4>
-                      <p className="text-xs sm:text-base text-neutral-400 leading-relaxed">Your entire team is bottlenecked, slowing down the whole project timeline.</p>
-                    </div>
-                  </motion.div>
+                  <ul className="mt-6 space-y-3">
+                    {PROBLEM_SECTION.without.problems.map((problem, index) => (
+                      <li key={index} className="flex items-start gap-2 text-sm text-gray-400">
+                        <div className="min-w-5 pt-0.5"><X size={16} className="text-red-400" /></div>
+                        <span>{problem}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </motion.div>
 
               {/* Right Column - With Mock API */}
               <motion.div
                 initial={{ opacity: 0, x: 50 }}
-                animate={storyInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4 }}
+                viewport={{ once: true, amount: 0.3 }}
                 className="flex flex-col h-full"
               >
                 <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 sm:p-8 mb-6 sm:mb-10 shadow-xl relative h-full">
                   <div className="absolute -top-3 -left-3 px-2 sm:px-4 py-1 sm:py-2 bg-green-500/20 border border-green-500/30 rounded-lg flex items-center gap-2">
                     <Check size={16} className="text-green-400" />
-                    <h3 className="text-sm sm:text-xl font-semibold text-green-300">With Mock API</h3>
+                    <h3 className="text-sm sm:text-xl font-semibold text-green-300">
+                      {PROBLEM_SECTION.with.title}
+                    </h3>
                   </div>
                   <div className="bg-neutral-800/70 rounded-lg p-3 sm:p-6 mt-6 sm:mt-8 backdrop-blur-sm border border-neutral-700/50 font-mono">
                     <div className="overflow-x-auto">
-                      <CodeBlock code={afterCode} language="javascript" />
+                      <CodeBlock code={AFTER_CODE} language="javascript" />
                     </div>
                   </div>
-                  <div className="mt-4 sm:mt-6 flex items-center gap-3 text-green-400 border-t border-neutral-800 pt-4 sm:pt-6">
-                    <PlayCircle size={16} className="sm:text-lg" />
-                    <span className="text-xs sm:text-sm">Development continues unblocked</span>
-                  </div>
-                </div>
-
-                <div className="space-y-4 sm:space-y-6">
-                  <motion.div 
-                    className="flex items-start gap-3 sm:gap-5"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={storyInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                    transition={{ delay: 0.5 }}
-                  >
-                    <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center bg-green-500/20 text-green-400 mt-1 shadow-lg shadow-green-500/10">
-                      <Check size={18} className="sm:size-6" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-base sm:text-lg mb-1 sm:mb-2">Instant Feedback</h4>
-                      <p className="text-xs sm:text-base text-neutral-400 leading-relaxed">Iterate on UI with realistic data immediately, allowing for rapid development cycles.</p>
-                    </div>
-                  </motion.div>
-                  
-                  <motion.div 
-                    className="flex items-start gap-3 sm:gap-5"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={storyInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                    transition={{ delay: 0.6 }}
-                  >
-                    <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center bg-green-500/20 text-green-400 mt-1 shadow-lg shadow-green-500/10">
-                      <Check size={18} className="sm:size-6" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-base sm:text-lg mb-1 sm:mb-2">Production-Like Data</h4>
-                      <p className="text-xs sm:text-base text-neutral-400 leading-relaxed">APIs match your exact requirements with realistic responses you can customize.</p>
-                    </div>
-                  </motion.div>
-                  
-                  <motion.div 
-                    className="flex items-start gap-3 sm:gap-5"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={storyInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                    transition={{ delay: 0.7 }}
-                  >
-                    <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center bg-green-500/20 text-green-400 mt-1 shadow-lg shadow-green-500/10">
-                      <Check size={18} className="sm:size-6" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-base sm:text-lg mb-1 sm:mb-2">Team Independence</h4>
-                      <p className="text-xs sm:text-base text-neutral-400 leading-relaxed">Frontend development proceeds at full speed without backend dependencies.</p>
-                    </div>
-                  </motion.div>
+                  <ul className="mt-6 space-y-3">
+                    {PROBLEM_SECTION.with.benefits.map((benefit, index) => (
+                      <li key={index} className="flex items-start gap-2 text-sm text-gray-400">
+                        <div className="min-w-5 pt-0.5"><Check size={16} className="text-green-400" /></div>
+                        <span>{benefit}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </motion.div>
             </div>
           </div>
         </section>
 
-        {/* Development Timeline - Mobile Responsive */}
-        <section className="py-16 sm:py-24 bg-gradient-to-b from-black to-gray-900">
-          <div className="container mx-auto px-4 sm:px-6">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-10 sm:mb-16 text-center">The Developer Journey</h2>
-
-            <div className="relative">
-              {/* Timeline connector - Hide on mobile, show on larger screens */}
-              <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-blue-700/30 transform -translate-x-1/2 hidden md:block"></div>
-
-              {/* Mobile timeline - vertical with left alignment */}
-              <div className="md:hidden">
-                {timelineSteps.map((step, index) => (
-                  <motion.div
-                    key={index}
-                    className="flex flex-col mb-10 relative"
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                  >
-                    {/* Left timeline line */}
-                    <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-blue-700/30"></div>
-                    
-                    {/* Circle with number */}
-                    <div className="z-10 flex-shrink-0 mb-4">
-                      <div className="w-12 h-12 rounded-full bg-blue-600 border-4 border-black flex items-center justify-center shadow-lg shadow-blue-500/30">
-                        <span className="font-bold">{index + 1}</span>
-                      </div>
-                    </div>
-                    
-                    {/* Content */}
-                    <div className="ml-4">
-                      <h3 className="text-lg font-bold mb-2">{step.title}</h3>
-                      <p className="text-neutral-400">{step.description}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Desktop timeline - alternating sides */}
-              <div className="hidden md:block">
-                {timelineSteps.map((step, index) => (
-                  <motion.div
-                    key={index}
-                    className={`flex items-center mb-20 ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                  >
-                    <div className={`w-1/2 px-4 ${index % 2 === 0 ? 'text-right' : 'text-left'}`}>
-                      <h3 className="text-xl font-bold mb-2">{step.title}</h3>
-                      <p className="text-neutral-400">{step.description}</p>
-                    </div>
-
-                    <div className="relative z-10 flex-shrink-0">
-                      <div className="w-12 h-12 rounded-full bg-blue-600 border-4 border-black flex items-center justify-center shadow-lg shadow-blue-500/30">
-                        <span className="font-bold">{index + 1}</span>
-                      </div>
-                      <div className="absolute top-0 left-0 right-0 bottom-0 rounded-full bg-blue-600 opacity-40 animate-ping"></div>
-                    </div>
-
-                    <div className="w-1/2 px-4"></div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
+        {/* How it Works */}
+        <section className="py-16 sm:py-24 relative overflow-hidden bg-gradient-to-b from-black to-gray-950">
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute top-1/4 right-1/4 w-[60vw] h-[60vw] max-w-[600px] max-h-[600px] bg-cyan-500/10 rounded-full blur-[120px]"></div>
+            <div className="absolute bottom-1/4 left-1/4 w-[40vw] h-[40vw] max-w-[400px] max-h-[400px] bg-blue-500/10 rounded-full blur-[120px]"></div>
           </div>
-        </section>
 
-        {/* Features with Scroll Animation */}
-        <section className="py-16 sm:py-24 relative" ref={featureRef}>
-          <div className="container mx-auto px-4 sm:px-6">
+          <div className="container mx-auto px-4 sm:px-6 relative z-10">
             <motion.div
+              className="text-center mb-14"
               initial={{ opacity: 0, y: 20 }}
-              animate={featureInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="text-center mb-10 sm:mb-16"
+              viewport={{ once: true, amount: 0.3 }}
             >
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">Designed for Developers</h2>
-              <p className="text-base sm:text-lg md:text-xl text-neutral-400 max-w-2xl mx-auto px-2">
-                Everything you need to create realistic APIs without writing a single line of backend code
-              </p>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-blue-900/30 to-indigo-900/30 rounded-full text-blue-300 text-sm font-medium mb-6">
+                <Star size={16} className="text-yellow-400" />
+                {HOW_IT_WORKS.badge}
+              </div>
+              <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight font-heading">
+                <span className="text-white">{HOW_IT_WORKS.heading.split('to ')[0]}to</span>
+                <br className="hidden sm:block" />
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">
+                  {HOW_IT_WORKS.heading.split('to ')[1]}
+                </span>
+              </h2>
             </motion.div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
-              {[
-                {
-                  icon: <Code className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-500" />,
-                  title: "Instant Mock APIs",
-                  description: "Create custom API endpoints in seconds with JSON responses that match your needs.",
-                  bgColor: "bg-blue-500/20" 
-                },
-                {
-                  icon: <PauseCircle className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500" />,
-                  title: "Simulate Real Conditions",
-                  description: "Add network delays, error states, and conditional responses to test all scenarios.",
-                  bgColor: "bg-blue-500/20"
-                },
-                {
-                  icon: <RefreshCw className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-500" />,
-                  title: "Easy Management",
-                  description: "Organize and version your mock APIs with an intuitive dashboard interface.",
-                  bgColor: "bg-blue-500/20"
-                }
-              ].map((feature, index) => (
+            {/* 3-Step Process */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              {HOW_IT_WORKS.steps.map((step, index) => (
                 <motion.div
                   key={index}
-                  className="bg-neutral-900 p-6 sm:p-8 rounded-xl border border-neutral-800 group hover:border-blue-900/40 transition-all"
+                  className="bg-gray-900/80 backdrop-blur-sm border border-gray-800 rounded-xl p-6 relative overflow-hidden group"
                   initial={{ opacity: 0, y: 30 }}
-                  animate={featureInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true, amount: 0.3 }}
                   whileHover={{ y: -5, transition: { duration: 0.2 } }}
                 >
-                  <div className={`w-12 h-12 sm:w-16 sm:h-16 ${feature.bgColor} rounded-lg flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform`}>
-                    {feature.icon}
+                  <div className={`absolute -top-6 -right-6 w-20 h-20 rounded-full bg-gradient-to-br ${step.color} opacity-20 group-hover:opacity-30 transition-opacity`}></div>
+                  <div className="relative z-10">
+                    <div className="flex items-center mb-4">
+                      <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${step.color} flex items-center justify-center text-white font-bold text-xl shadow-lg`}>
+                        {step.number}
+                      </div>
+                      <div className="ml-4 bg-green-500/20 text-green-300 text-xs font-medium py-1 px-2 rounded-full">
+                        {step.time}
+                      </div>
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">{step.title}</h3>
+                    <p className="text-gray-400 text-sm mb-3">{step.description}</p>
+                    <div className="mb-3 p-2 rounded-md bg-gray-800/50 border border-gray-700/50 text-xs font-mono text-blue-300">
+                      {step.example}
+                    </div>
+                    <div className="flex items-center text-xs text-gray-500 mb-2">
+                      <Clock4 size={12} className="mr-1" />
+                      <span>Without mocks: <span className="text-red-400">{step.traditional}</span></span>
+                    </div>
                   </div>
-                  <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 font-heading">{feature.title}</h3>
-                  <p className="text-sm sm:text-base text-neutral-400 font-body">{feature.description}</p>
                 </motion.div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Final CTA - Mobile Responsive */}
-        <section className="py-16 sm:py-32 relative overflow-hidden">
-          {/* Modern animated gradient background */}
-          <div className="absolute inset-0 w-full h-full">
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-600/10 via-indigo-500/5 to-purple-600/10 animate-gradient-slow"></div>
-            <div className="absolute -top-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-blue-500/10 blur-[100px] animate-pulse-slow"></div>
-            <div className="absolute -bottom-[20%] -left-[10%] w-[60%] h-[60%] rounded-full bg-purple-500/10 blur-[100px] animate-pulse-slow animation-delay-2000"></div>
-          </div>
-          
-          {/* Decorative elements - hidden on smallest screens */}
-          <div className="absolute inset-0 opacity-30 hidden sm:block">
-            <div className="absolute top-[10%] left-[15%] w-1 h-1 bg-blue-400 rounded-full animate-ping-slow"></div>
-            <div className="absolute top-[30%] right-[25%] w-2 h-2 bg-purple-400 rounded-full animate-ping-slow animation-delay-1000"></div>
-            <div className="absolute bottom-[20%] left-[35%] w-1.5 h-1.5 bg-indigo-400 rounded-full animate-ping-slow animation-delay-3000"></div>
-          </div>
+        {/* Key Benefits */}
+        <section className="py-16 sm:py-24 bg-gradient-to-b from-gray-950 to-black" ref={featureRef}>
+          <div className="container mx-auto px-4 sm:px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={featureInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">{KEY_BENEFITS.heading}</h2>
+              <p className="text-base sm:text-lg md:text-xl text-neutral-400 max-w-2xl mx-auto px-2">
+                {KEY_BENEFITS.description}
+              </p>
+            </motion.div>
 
-          <div className="container mx-auto px-4 sm:px-6 relative z-10">
-            <div className="relative max-w-5xl mx-auto">
-              {/* Glass card */}
-              <motion.div
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                viewport={{ once: true }}
-                className="backdrop-blur-xl bg-white/[0.01] border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
-              >
-                <div className="flex flex-col md:flex-row items-stretch">
-                  {/* Content side */}
-                  <div className="w-full md:w-2/3 p-6 sm:p-12 md:p-16">
-                    <motion.h2 
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1, duration: 0.5 }}
-                      viewport={{ once: true }}
-                      className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight font-heading bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-100 to-blue-200"
-                    >
-                      Ready to accelerate your workflow?
-                    </motion.h2>
-                    
-                    <motion.p 
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2, duration: 0.5 }}
-                      viewport={{ once: true }}
-                      className="text-base sm:text-lg md:text-xl text-white/70 mt-4 sm:mt-6 mb-6 sm:mb-10 leading-relaxed max-w-xl"
-                    >
-                      Join thousands of developers who've transformed their development process with Mock API Playground.
-                    </motion.p>
-                    
-                    <motion.div 
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3, duration: 0.5 }}
-                      viewport={{ once: true }}
-                      className="flex flex-wrap gap-4"
-                    >
-                      <Link
-                        href="/auth/signup"
-                        className="w-full sm:w-auto text-center group relative overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-medium text-base sm:text-lg shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-300"
-                      >
-                        <span className="relative z-10 flex items-center justify-center sm:justify-start gap-2">
-                          Start building now <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
-                        </span>
-                        <span className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-blue-600 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
-                      </Link>
-                    </motion.div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {KEY_BENEFITS.benefits.map((benefit, index) => (
+                <motion.div
+                  key={index}
+                  className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-5"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1 + index * 0.1 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                >
+                  <div className={`w-12 h-12 rounded-full ${benefit.color} flex items-center justify-center mb-4`}>
+                    {getIconComponent(benefit.iconName)}
                   </div>
-                  
-                  {/* Visual side - hidden on mobile */}
-                  <div className="w-full md:w-1/3 bg-gradient-to-br from-blue-600/20 to-indigo-600/20 relative hidden md:block">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <motion.div 
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.4, duration: 0.7 }}
-                        viewport={{ once: true }}
-                        className="relative"
-                      >
-                        {/* Code editor visual */}
-                        <div className="w-64 h-64 rounded-2xl bg-gray-900/90 border border-gray-700/50 shadow-xl p-4 transform rotate-6 backdrop-blur-sm">
-                          <div className="flex items-center gap-1.5 mb-3">
-                            <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
-                            <div className="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
-                            <div className="w-2.5 h-2.5 rounded-full bg-green-400"></div>
-                          </div>
-                          <div className="space-y-2">
-                            <div className="h-3 w-full bg-blue-500/30 rounded"></div>
-                            <div className="h-3 w-4/5 bg-green-500/30 rounded"></div>
-                            <div className="h-3 w-3/5 bg-purple-500/30 rounded"></div>
-                            <div className="h-3 w-2/3 bg-blue-500/30 rounded"></div>
-                          </div>
-                        </div>
-                        
-                        {/* Floating API response */}
-                        <div className="absolute -bottom-10 -left-16 w-48 h-36 rounded-xl bg-gray-900/90 border border-gray-700/50 shadow-xl p-3 transform -rotate-3 backdrop-blur-sm">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="text-xs text-green-400 font-mono">200 OK</div>
-                            <div className="text-xs text-gray-400 font-mono">48ms</div>
-                          </div>
-                          <div className="space-y-1.5">
-                            <div className="h-2.5 w-full bg-indigo-500/30 rounded"></div>
-                            <div className="h-2.5 w-5/6 bg-indigo-500/30 rounded"></div>
-                            <div className="h-2.5 w-4/6 bg-indigo-500/30 rounded"></div>
-                          </div>
-                        </div>
-                      </motion.div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
+                  <h3 className="text-lg font-bold mb-2">{benefit.title}</h3>
+                  <p className="text-gray-400 text-sm">{benefit.description}</p>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* Responsive logo overlay */}
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 transform opacity-10 pointer-events-none max-w-full">
-          <img src="/favicon.ico" alt="MockFlow Logo" className="w-[40vw] max-w-[200px] h-[40vw] max-h-[200px] sm:max-w-[400px] sm:max-h-[400px]" />
-        </div>
+        {/* Testimonial */}
+        <section className="py-12 sm:py-16 bg-black">
+          <div className="container mx-auto px-4 sm:px-6">
+            <motion.div
+              className="bg-gradient-to-br from-blue-900/20 to-indigo-900/20 rounded-lg p-5 border border-blue-900/30 max-w-3xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true, amount: 0.3 }}
+            >
+              <blockquote className="text-lg font-medium text-gray-300 italic">
+                "{TESTIMONIAL.quote}"
+              </blockquote>
+              <div className="mt-4 text-gray-400 flex items-center">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 mr-3"></div>
+                <div>
+                  <div className="text-sm font-medium">{TESTIMONIAL.name}</div>
+                  <div className="text-xs">{TESTIMONIAL.role}</div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Final CTA */}
+        <section className="py-16 sm:py-24 relative overflow-hidden bg-gradient-to-b from-black to-gray-950">
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute top-1/4 right-1/4 w-[60vw] h-[60vw] max-w-[600px] max-h-[600px] bg-blue-500/10 rounded-full blur-[120px]"></div>
+          </div>
+
+          <div className="container mx-auto px-4 sm:px-6 relative z-10">
+            <motion.div
+              className="text-center max-w-3xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true, amount: 0.3 }}
+            >
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6">{FINAL_CTA.heading}</h2>
+              <p className="text-neutral-400 mb-8">{FINAL_CTA.description}</p>
+              <Link
+                href="/auth/signup"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-8 py-4 rounded-full font-medium text-lg shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all hover:-translate-y-1"
+              >
+                {FINAL_CTA.buttonText} <ChevronRight size={20} />
+              </Link>
+              <div className="mt-6 flex items-center justify-center gap-6">
+                {FINAL_CTA.benefits.map((benefit, index) => (
+                  <div key={index} className="flex items-center text-gray-500 text-sm">
+                    <Check size={16} className="text-green-400 mr-2" />
+                    {benefit}
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </section>
 
         <Footer />
       </div>
