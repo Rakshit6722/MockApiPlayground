@@ -11,6 +11,7 @@ import {
 } from "@/app/_services/mock-auth";
 import EditModal from "../_common/EditModal";
 import { DeleteModal } from "../_common/DeleteModal";
+import { toast } from "react-toastify";
 
 interface Field {
   name: string;
@@ -27,11 +28,9 @@ interface MockAuth {
   updatedAt: string;
 }
 
-export default function MockAuthTable() {
+export default function MockAuthTable({fetchMockAuths, authError, mockAuths, setMockAuths, authLoading}: any) {
   const router = useRouter();
-  const [mockAuths, setMockAuths] = useState<MockAuth[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+
 
   // Modal state
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -40,20 +39,6 @@ export default function MockAuthTable() {
   const [editMock, setEditMock] = useState<MockAuth | null>(null);
 
   useEffect(() => {
-    const fetchMockAuths = async () => {
-      try {
-        setLoading(true);
-        const response = await getMockAuthRoutes();
-        const data = response.data;
-        setMockAuths(data.data || []);
-      } catch (err: any) {
-        setError(err.message || "An error occurred while fetching data");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchMockAuths();
   }, []);
 
@@ -106,7 +91,7 @@ export default function MockAuthTable() {
     setModalLoading(true);
     try {
       await deleteMockAuthRoute(deleteId);
-      setMockAuths((prev) => prev.filter((m) => m._id !== deleteId));
+      setMockAuths((prev: any) => prev.filter((m: any) => m._id !== deleteId));
       setDeleteId(null);
     } catch (err: any) {
       alert(err.message || "Failed to delete endpoint");
@@ -117,7 +102,7 @@ export default function MockAuthTable() {
 
   // Handle edit open
   const handleEditOpen = (id: string) => {
-    const found = mockAuths.find((m) => m._id === id) || null;
+    const found = mockAuths.find((m: any) => m._id === id) || null;
     setEditMock(found);
     setEditId(id);
   };
@@ -128,8 +113,8 @@ export default function MockAuthTable() {
     setModalLoading(true);
     try {
       await updateMockAuthRoute(editId, data);
-      setMockAuths((prev) =>
-        prev.map((m) =>
+      setMockAuths((prev: any) =>
+        prev.map((m: any) =>
           m._id === editId ? { ...m, endpoint: data.endpoint, fields: data.fields } : m
         )
       );
@@ -142,7 +127,7 @@ export default function MockAuthTable() {
     }
   };
 
-  if (loading) {
+  if (authLoading) {
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 className="h-8 w-8 text-indigo-500 animate-spin" />
@@ -151,10 +136,10 @@ export default function MockAuthTable() {
     );
   }
 
-  if (error) {
+  if (authError) {
     return (
       <div className="bg-red-900/20 border border-red-900/30 text-red-400 p-4 rounded-md">
-        <p>Error: {error}</p>
+        <p>Error: {authError}</p>
         <p className="text-sm mt-2">Please try refreshing the page.</p>
       </div>
     );
@@ -228,7 +213,7 @@ export default function MockAuthTable() {
               </tr>
             </thead>
             <tbody>
-              {mockAuths.map((auth) => (
+              {mockAuths.map((auth: any) => (
                 <tr
                   key={auth._id}
                   className="group hover:bg-gray-800/70 transition-colors duration-200 cursor-pointer"
