@@ -4,6 +4,7 @@ import { inter, montserrat, jetbrainsMono } from './fonts';
 import "./globals.css";
 import Providers from "./providers/ReduxProvider";
 import { ToastContainer } from "react-toastify";
+import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +35,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${montserrat.variable} ${jetbrainsMono.variable} antialiased`}
       >
         <Providers>
+        <Analytics/>
           {children}
           <ToastContainer
             toastClassName={'my-toast'}
