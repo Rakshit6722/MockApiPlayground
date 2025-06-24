@@ -129,6 +129,97 @@ export async function GET(
 
 }
 
+export async function PUT(
+    req: NextRequest,
+    context: {
+        params: { username: string, mockRoute: string }
+    }
+) {
+    try {
+        try {
+            await connectToDb()
+        } catch (err: any) {
+            console.error("error in connecting to db")
+            return NextResponse.json(
+                { message: "errro in connecting to db" },
+                { status: 500 }
+            )
+        }
+
+        const origin = req.headers.get("origin") || "*"
+
+        const { username, mockRoute } = context.params
+        const searchParams = req.nextUrl.searchParams
+        const id = searchParams.get('id')
+
+        const body = await req.json()
+
+        const user = await User.findOne({
+            username
+        })
+
+        let finalResponse: any = null
+
+        if (!user) {
+            finalResponse = NextResponse.json(
+                { message: "no user find with this username" },
+                { status: 404 }
+            )
+        }
+
+        const mock = await Mock.findOne({
+            userId: user._id,
+            route: mockRoute,
+        })
+
+        if (!mock) {
+            finalResponse = NextResponse.json({
+                message: "no mock route with this name present"
+            }, {
+                status: 404
+            })
+        }
+
+        const responseObject = mock?.response?.filter((item: any) => item.id === Number(id))
+
+        if (responseObject.length < 1) {
+            finalResponse = NextResponse.json(
+                { message: "no data with this id found, please try with some other id" },
+                { status: 404 }
+            )
+        }
+
+        const updatedData = {
+            ...responseObject[0],
+            ...body,
+            id: Number(id)
+        }
+
+        const updatedResponse = mock?.response?.map((item: any) => item?.id === Number(id) ? updatedData : item)
+
+        mock.response = updatedResponse
+        await mock.save()
+
+        finalResponse = NextResponse.json(
+            { success: true, data: mock, message: "updated successfully" },
+            { status: 200 }
+        )
+
+        finalResponse.headers.set("Access-Control-Allow-Origin", origin);
+        finalResponse.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        finalResponse.headers.set("Access-Control-Allow-Headers", "Content-Type");
+
+        return finalResponse;
+
+    } catch (err: any) {
+        console.error("Error in DELETE /api/mocks/[username]/[mockRoute]:", err);
+        return NextResponse.json(
+            { success: false, data: null, message: "Interval server error" },
+            { status: 500 }
+        )
+    }
+}
+
 export async function DELETE(req: NextRequest,
     context: {
         params: { username: string, mockRoute: string }
@@ -141,19 +232,23 @@ export async function DELETE(req: NextRequest,
         } catch (err: any) {
             console.error("error in connecting to db")
             return NextResponse.json(
-                { message: "errro in connecting to db" },
+                { message: "error in connecting to db" },
                 { status: 500 }
             )
         }
+
+        const origin = req.headers.get("origin") || "*"
 
         const searchParams = req.nextUrl.searchParams;
         const id = searchParams.get("id")
 
         const { username, mockRoute } = context.params
 
+        let finalResponse: any = null
+
         const user = await User.findOne({ username })
         if (!user) {
-            return NextResponse.json(
+            finalResponse = NextResponse.json(
                 { message: "user not found" },
                 { status: 404 }
             )
@@ -166,22 +261,26 @@ export async function DELETE(req: NextRequest,
 
         const foundMock = mock?.response?.some((item: any) => item.id === Number(id))
         if (!foundMock) {
-            return NextResponse.json(
+            finalResponse = NextResponse.json(
                 { message: "No item with this id exist" },
                 { status: 404 }
             )
         }
 
         const newMock = mock?.response?.filter((item: any) => item.id !== Number(id))
-        // console.log("new mock",newMock)
-
         mock.response = newMock
         await mock.save();
 
-        return NextResponse.json(
+        finalResponse = NextResponse.json(
             { statue: true, message: "Deleted  successfully" },
             { status: 200 }
         )
+
+        finalResponse.headers.set("Access-Control-Allow-Origin", origin)
+        finalResponse.headers.set("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
+        finalResponse.headers.set("Access-Control-Allow-Headers", "Content-type")
+
+        return finalResponse;
 
     } catch (err: any) {
         console.error("Error in DELETE /api/mocks/[username]/[mockRoute]:", err);
