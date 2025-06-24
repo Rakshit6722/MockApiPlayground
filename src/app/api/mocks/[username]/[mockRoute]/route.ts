@@ -104,15 +104,17 @@ export async function GET(
                     message: "Fetched successfully"
                 };
                 finalResponse = NextResponse.json(paginatedResponse, { status: mock.status || 200 });
+            } else {
+                response = response.slice(startIndex, endIndex);
             }
-
-            response = response.slice(startIndex, endIndex);
         }
 
-        finalResponse = NextResponse.json(
-            { success: true, data: response, message: "Fetched successfully" },
-            { status: mock.status || 200 }
-        );
+        if (!finalResponse) {
+            finalResponse = NextResponse.json(
+                { success: true, data: response, message: "Fetched successfully" },
+                { status: mock.status || 200 }
+            );
+        }
 
         finalResponse.headers.set("Access-Control-Allow-Origin", origin);
         finalResponse.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
