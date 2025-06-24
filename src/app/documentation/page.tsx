@@ -245,6 +245,77 @@ export default function DocumentationPage() {
           </div>
         </section>
         
+        {/* Data Modification Section */}
+        <section className="mb-12" id="data-modification">
+          <h2 className="text-2xl font-semibold text-white mb-4 flex items-center gap-2">
+            <Terminal size={20} className="text-green-500" />
+            Data Modification
+          </h2>
+
+          <p className="text-gray-400 mb-6">
+            MockFlow allows you to modify your mock data using standard HTTP methods. Use PUT to update existing data and DELETE to remove data.
+          </p>
+
+          {/* PUT Example */}
+          <div className="bg-gray-900 rounded-lg border border-gray-800 overflow-hidden shadow-sm mb-6">
+            <div className="border-b border-gray-800 px-4 py-3 bg-gray-900/70 flex justify-between items-center">
+              <div className="text-sm font-medium text-gray-300">Update Data with PUT</div>
+              <button
+                className="text-gray-400 hover:text-blue-500 transition-colors p-1 rounded cursor-pointer"
+                onClick={() => handleCopy(codeExamples.updateData, 'updateData')}
+              >
+                {copiedCode === 'updateData' ?
+                  <span className="flex items-center text-green-500 text-xs"><Check size={14} className="mr-1" /> Copied!</span> :
+                  <span className="flex items-center text-xs"><Copy size={14} className="mr-1" /> Copy code</span>
+                }
+              </button>
+            </div>
+            <div className="bg-gray-950 overflow-hidden">
+              <pre className="p-4 overflow-x-auto text-sm">
+                <code className="font-mono text-blue-100">{codeExamples.updateData}</code>
+              </pre>
+            </div>
+          </div>
+
+          {/* DELETE Example */}
+          <div className="bg-gray-900 rounded-lg border border-gray-800 overflow-hidden shadow-sm mb-6">
+            <div className="border-b border-gray-800 px-4 py-3 bg-gray-900/70 flex justify-between items-center">
+              <div className="text-sm font-medium text-gray-300">Remove Data with DELETE</div>
+              <button
+                className="text-gray-400 hover:text-blue-500 transition-colors p-1 rounded cursor-pointer"
+                onClick={() => handleCopy(codeExamples.deleteData, 'deleteData')}
+              >
+                {copiedCode === 'deleteData' ?
+                  <span className="flex items-center text-green-500 text-xs"><Check size={14} className="mr-1" /> Copied!</span> :
+                  <span className="flex items-center text-xs"><Copy size={14} className="mr-1" /> Copy code</span>
+                }
+              </button>
+            </div>
+            <div className="bg-gray-950 overflow-hidden">
+              <pre className="p-4 overflow-x-auto text-sm">
+                <code className="font-mono text-blue-100">{codeExamples.deleteData}</code>
+              </pre>
+            </div>
+          </div>
+
+          {/* Notes about data modification */}
+          <div className="bg-green-900/10 border border-green-800/30 rounded-lg p-4 text-sm text-green-300">
+            <div className="flex items-start gap-2">
+              <Info size={16} className="mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="font-medium mb-2">Important Notes:</h4>
+                <ul className="list-disc pl-4 space-y-2">
+                  <li>Use the <code className="px-1.5 py-0.5 bg-green-900/30 rounded text-xs">?id=X</code> query parameter to specify which item to update or delete</li>
+                  <li>PUT requests require a JSON body with the fields you want to update</li>
+                  <li>When updating, you only need to include fields you want to change</li>
+                  <li>The API preserves fields not included in your update request</li>
+                  <li>DELETE operations are permanent and cannot be undone</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Authentication Section */}
         <section className="mb-12" id="authentication">
           <h2 className="text-2xl font-semibold text-white mb-4 flex items-center gap-2">

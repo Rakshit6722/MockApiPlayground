@@ -258,6 +258,35 @@ function Page({ params, searchParams }: PageProps) {
                         </div>
                     </motion.div>
 
+                    {/* Data Modification Snackbar */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        className="mb-6 p-0.5 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-emerald-500/20 rounded-lg overflow-hidden shadow-lg"
+                    >
+                        <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg p-3 flex items-center gap-3">
+                            <div className="flex-shrink-0">
+                                <div className="bg-blue-500/10 border border-blue-500/20 p-1.5 rounded-md">
+                                    <Server size={16} className="text-blue-400" />
+                                </div>
+                            </div>
+
+                            <div className="flex-1 min-w-0">
+                                <p className="text-sm text-gray-200 font-medium">
+                                    <span className="text-blue-400">PUT</span> & <span className="text-rose-400">DELETE</span> supported with <code className="bg-gray-800/80 px-1 py-0.5 rounded text-xs text-gray-300">?id=1</code>
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={() => setActiveTab('guide')}
+                                className="flex-shrink-0 text-xs cursor-pointer bg-gray-800/80 hover:bg-gray-700/80 text-gray-300 hover:text-white px-2.5 py-1 rounded border border-gray-700/50 transition-colors"
+                            >
+                                Learn More
+                            </button>
+                        </div>
+                    </motion.div>
+
                     {/* Tabs Navigation */}
                     <div className="mb-6 flex border-b border-gray-800">
                         <button

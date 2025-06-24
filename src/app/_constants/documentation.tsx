@@ -335,6 +335,75 @@ getUserProfile();`,
     // Add any other fields you need
   ]
 }`,
+
+  // New examples for updating and deleting data
+  updateData: `// Example PUT request to update data
+// -----------------------------------------
+// Replace {username} with your MockFlow username
+// Replace {mockRoute} with your endpoint route name
+// The id query parameter specifies which item to update
+
+const updateItem = async (id, updatedData) => {
+  try {
+    const url = '${getOrigin()}/api/mocks/{username}/{mockRoute}?id=' + id;
+    
+    // Define the data you want to update
+    // Only include fields you want to change
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updatedData)
+    });
+
+    if (!response.ok) {
+      throw new Error('Update failed: ' + response.status);
+    }
+    
+    const result = await response.json();
+    console.log('Item updated successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('Error updating data:', error);
+  }
+};
+
+// Example usage
+updateItem(2, {
+  name: "Updated Product Name",
+  price: 99.99,
+  inStock: true
+});`,
+
+  deleteData: `// Example DELETE request to remove data
+// -----------------------------------------
+// Replace {username} with your MockFlow username
+// Replace {mockRoute} with your endpoint route name
+// The id query parameter specifies which item to delete
+
+const deleteItem = async (id) => {
+  try {
+    const url = '${getOrigin()}/api/mocks/{username}/{mockRoute}?id=' + id;
+    
+    const response = await fetch(url, {
+      method: 'DELETE'
+    });
+
+    if (!response.ok) {
+      throw new Error('Delete failed: ' + response.status);
+    }
+    
+    const result = await response.json();
+    console.log('Item deleted successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('Error deleting data:', error);
+  }
+};
+
+// Example usage
+deleteItem(2);`,
 };
 
 // New auth flow explanation section

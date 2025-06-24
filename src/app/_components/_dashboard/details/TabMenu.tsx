@@ -4,7 +4,7 @@ import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { getStatusColor } from '@/app/utils/dashboard';
 import { formatJson } from '@/app/utils/common';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AlertTriangle, CheckCircle2, ChevronRight, Clock, Code, Copy, Database, Filter, HelpCircle, Info, Layers, List, Terminal, Zap } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ChevronRight, Clock, Code, Copy, Database, Edit3, Filter, HelpCircle, Info, Layers, List, Server, Terminal, Trash2, Zap } from 'lucide-react';
 
 function TabMenu({activeTab, routeDetails, fullApiUrl, toggleSection, visibleSection, testResponse, copied, setCopied, copyToClipboard}: any) {
     return (
@@ -353,6 +353,135 @@ function TabMenu({activeTab, routeDetails, fullApiUrl, toggleSection, visibleSec
 
                         {/* Parameter Sections */}
                         <div className="space-y-6">
+                            {/* Data Modification - New section added at the top */}
+                            <div className="border border-gray-800 rounded-xl overflow-hidden">
+                                <button
+                                    onClick={() => toggleSection('dataModification')}
+                                    className="w-full flex items-center justify-between p-4 text-left transition-colors hover:bg-gray-800/30"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                            <Server size={16} />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-medium text-gray-200">Data Modification</h3>
+                                            <p className="text-xs text-gray-400 mt-0.5">
+                                                Update and delete data with PUT and DELETE
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <ChevronRight
+                                        size={18}
+                                        className={`text-gray-400 transition-transform ${visibleSection === 'dataModification' ? 'rotate-90' : ''}`}
+                                    />
+                                </button>
+
+                                <AnimatePresence>
+                                    {visibleSection === 'dataModification' && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            transition={{ duration: 0.2 }}
+                                            className="overflow-hidden"
+                                        >
+                                            <div className="p-4 pt-0 border-t border-gray-800 space-y-4">
+                                                {/* PUT Request */}
+                                                <div className="bg-gray-800/50 rounded-lg p-4">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <div className="px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded text-xs font-medium">PUT</div>
+                                                        <h4 className="text-sm font-medium text-gray-300">Update Existing Data</h4>
+                                                    </div>
+                                                    <div className="space-y-3">
+                                                        <div className="flex flex-col">
+                                                            <code className="px-3 py-2 bg-gray-800 rounded-lg text-amber-400 font-mono text-sm mb-1">
+                                                                {fullApiUrl}?id=1
+                                                            </code>
+                                                        </div>
+                                                        <ul className="text-sm text-gray-400 space-y-1.5 list-disc pl-5">
+                                                            <li>Use <code className="text-xs bg-gray-800/70 px-1 py-0.5 rounded text-blue-400">PUT</code> method to update existing items</li>
+                                                            <li>Include <code className="text-xs bg-gray-800/70 px-1 py-0.5 rounded text-blue-400">id</code> query parameter to specify which item to update</li>
+                                                            <li>Send a JSON body with only the fields you want to update</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+
+                                                {/* PUT Example */}
+                                                <div className="bg-blue-500/5 rounded-lg p-4">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <Edit3 size={14} className="text-amber-400" />
+                                                        <h4 className="text-sm font-medium text-gray-300">PUT Example</h4>
+                                                    </div>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                        <div>
+                                                            <div className="text-xs text-gray-500 mb-1">Request:</div>
+                                                            <code className="block px-3 py-2 bg-gray-800 rounded-lg text-amber-400 font-mono text-xs">
+                                                                // URL<br />
+                                                                {fullApiUrl}?id=1<br /><br />
+                                                                // Method: PUT<br />
+                                                                // Body:<br />
+                                                                {`{\n  "name": "Updated Item",\n  "status": "active"\n}`}
+                                                            </code>
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-xs text-gray-500 mb-1">Response:</div>
+                                                            <code className="block px-3 py-2 bg-gray-800 rounded-lg text-green-400 font-mono text-xs">
+                                                                {`{\n  "success": true,\n  "data": {...},\n  "message": "updated successfully"\n}`}
+                                                            </code>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* DELETE Request */}
+                                                <div className="bg-gray-800/50 rounded-lg p-4 mt-4">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <div className="px-2 py-0.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded text-xs font-medium">DELETE</div>
+                                                        <h4 className="text-sm font-medium text-gray-300">Remove Data</h4>
+                                                    </div>
+                                                    <div className="space-y-3">
+                                                        <div className="flex flex-col">
+                                                            <code className="px-3 py-2 bg-gray-800 rounded-lg text-amber-400 font-mono text-sm mb-1">
+                                                                {fullApiUrl}?id=1
+                                                            </code>
+                                                        </div>
+                                                        <ul className="text-sm text-gray-400 space-y-1.5 list-disc pl-5">
+                                                            <li>Use <code className="text-xs bg-gray-800/70 px-1 py-0.5 rounded text-blue-400">DELETE</code> method to remove items</li>
+                                                            <li>Include <code className="text-xs bg-gray-800/70 px-1 py-0.5 rounded text-blue-400">id</code> query parameter to specify which item to delete</li>
+                                                            <li>No request body is needed for DELETE operations</li>
+                                                            <li>Deletion is permanent and cannot be undone</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+
+                                                {/* DELETE Example */}
+                                                <div className="bg-blue-500/5 rounded-lg p-4">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <Trash2 size={14} className="text-rose-400" />
+                                                        <h4 className="text-sm font-medium text-gray-300">DELETE Example</h4>
+                                                    </div>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                        <div>
+                                                            <div className="text-xs text-gray-500 mb-1">Request:</div>
+                                                            <code className="block px-3 py-2 bg-gray-800 rounded-lg text-amber-400 font-mono text-xs">
+                                                                // URL<br />
+                                                                {fullApiUrl}?id=1<br /><br />
+                                                                // Method: DELETE
+                                                            </code>
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-xs text-gray-500 mb-1">Response:</div>
+                                                            <code className="block px-3 py-2 bg-gray-800 rounded-lg text-green-400 font-mono text-xs">
+                                                                {`{\n  "success": true,\n  "message": "Item deleted successfully"\n}`}
+                                                            </code>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+
                             {/* Filtering */}
                             <div className="border border-gray-800 rounded-xl overflow-hidden">
                                 <button
