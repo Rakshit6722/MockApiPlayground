@@ -126,5 +126,68 @@ export async function GET(
             { status: 500 }
         );
     }
-    
+
+}
+
+export async function DELETE(req: NextRequest,
+    context: {
+        params: { username: string, mockRoute: string }
+    }
+) {
+    try {
+
+        try {
+            await connectToDb()
+        } catch (err: any) {
+            console.error("error in connecting to db")
+            return NextResponse.json(
+                { message: "errro in connecting to db" },
+                { status: 500 }
+            )
+        }
+
+        const searchParams = req.nextUrl.searchParams;
+        const id = searchParams.get("id")
+
+        const { username, mockRoute } = context.params
+
+        const user = await User.findOne({ username })
+        if (!user) {
+            return NextResponse.json(
+                { message: "user not found" },
+                { status: 404 }
+            )
+        }
+
+        const mock = await Mock.findOne({
+            userId: user._id,
+            route: mockRoute,
+        })
+
+        const foundMock = mock?.response?.some((item: any) => item.id === Number(id))
+        if (!foundMock) {
+            return NextResponse.json(
+                { message: "No item with this id exist" },
+                { status: 404 }
+            )
+        }
+
+        const newMock = mock?.response?.filter((item: any) => item.id !== Number(id))
+        // console.log("new mock",newMock)
+
+        mock.response = newMock
+        await mock.save();
+
+        return NextResponse.json(
+            { statue: true, message: "Deleted  successfully" },
+            { status: 200 }
+        )
+
+    } catch (err: any) {
+        console.error("Error in DELETE /api/mocks/[username]/[mockRoute]:", err);
+        return NextResponse.json(
+            { success: false, data: null, message: "Interval server error" },
+            { status: 500 }
+        )
+    }
 }
