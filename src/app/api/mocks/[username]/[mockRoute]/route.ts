@@ -197,13 +197,15 @@ export async function PUT(
             id: Number(id)
         }
 
-        const updatedResponse = mock?.response?.map((item: any) => item?.id === Number(id) ? updatedData : item)
+        let updatedResponse = mock?.response?.map((item: any) => item?.id === Number(id) ? updatedData : item)
 
         mock.response = updatedResponse
         await mock.save()
 
+        updatedResponse = mock?.response?.filter((item: any) => item.id === Number(id))
+
         finalResponse = NextResponse.json(
-            { success: true, data: mock, message: "updated successfully" },
+            { success: true, data: updatedResponse[0], message: "updated successfully" },
             { status: 200 }
         )
 
