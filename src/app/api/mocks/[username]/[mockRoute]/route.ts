@@ -212,7 +212,7 @@ export async function PUT(
         return finalResponse;
 
     } catch (err: any) {
-        console.error("Error in DELETE /api/mocks/[username]/[mockRoute]:", err);
+        console.error("Error in put /api/mocks/[username]/[mockRoute]:", err);
         return NextResponse.json(
             { success: false, data: null, message: "Interval server error" },
             { status: 500 }
