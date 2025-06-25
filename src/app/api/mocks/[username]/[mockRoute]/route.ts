@@ -88,7 +88,7 @@ export async function GET(
 
                 if (response.length === 0) {
                     finalResponse = NextResponse.json(
-                        { success: false, data: null, message: "No item found with the specified filter" },
+                        { success: false, data: null, message: "No item found with the specified filter"},
                         { status: 404, headers: {
                             "Access-Control-Allow-Origin": origin,
                             "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
