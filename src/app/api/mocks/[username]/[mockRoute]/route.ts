@@ -246,9 +246,17 @@ export async function DELETE(req: NextRequest,
         const searchParams = req.nextUrl.searchParams;
         const id = searchParams.get("id")
 
+        let finalResponse: any = null
+
+        if(id === 'null'){
+            finalResponse = NextResponse.json(
+                {message:"no data with this id present"},
+                {status:400}
+            )
+        }
+
         const { username, mockRoute } = context.params
 
-        let finalResponse: any = null
 
         const user = await User.findOne({ username })
         if (!user) {
