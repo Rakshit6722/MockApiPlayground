@@ -78,23 +78,36 @@ export async function GET(
 
         let response = mock.response;
 
-        // Handle filtering by keyField if response is array
+        // Handle filtering by id or keyField if response is array
         if (!finalResponse && mock.isArray && Array.isArray(response) && mock.keyField) {
-            const filterValue = searchParams.get('id') || searchParams.get(mock.keyField);
+            let filterValue: string | null = null;
+            let filterKey: string = "id";
+
+            if (searchParams.get("id")) {
+                filterValue = searchParams.get("id");
+                filterKey = "id";
+            } else if (searchParams.get(mock.keyField)) {
+                filterValue = searchParams.get(mock.keyField);
+                filterKey = mock.keyField;
+            }
+
             if (filterValue) {
                 response = response.filter((item: any) =>
-                    String(item[mock.keyField]) === filterValue
+                    String(item[filterKey]) === filterValue
                 );
-                
+
 
                 if (response.length === 0) {
                     finalResponse = NextResponse.json(
-                        { success: false, data: null, message: "No item found with the specified filter"},
-                        { status: 404, headers: {
-                            "Access-Control-Allow-Origin": origin,
-                            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-                            "Access-Control-Allow-Headers": "Content-Type",
-                        } }
+                        { success: false, data: null, message: "No item found with the specified filter" },
+                        {
+                            status: 404,
+                            headers: {
+                                "Access-Control-Allow-Origin": origin,
+                                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                                "Access-Control-Allow-Headers": "Content-Type",
+                            },
+                        }
                     );
                     return finalResponse;
                 }
@@ -103,11 +116,14 @@ export async function GET(
                 if (response.length === 1) {
                     finalResponse = NextResponse.json(
                         { success: true, data: response[0], message: "Fetched successfully" },
-                        { status: mock.status || 200, headers: {
-                            "Access-Control-Allow-Origin": origin,
-                            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-                            "Access-Control-Allow-Headers": "Content-Type",
-                        } }
+                        {
+                            status: mock.status || 200,
+                            headers: {
+                                "Access-Control-Allow-Origin": origin,
+                                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                                "Access-Control-Allow-Headers": "Content-Type",
+                            },
+                        }
                     );
                     return finalResponse;
                 }
