@@ -85,6 +85,7 @@ export async function GET(
                 response = response.filter((item: any) =>
                     String(item[mock.keyField]) === filterValue
                 );
+                
 
                 if (response.length === 0) {
                     finalResponse = NextResponse.json(
