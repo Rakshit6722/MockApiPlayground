@@ -294,3 +294,15 @@ export async function DELETE(req: NextRequest,
         )
     }
 }
+
+export async function OPTIONS(req: NextRequest) {
+    const origin = req.headers.get("origin") || "*";
+    return new NextResponse(null, {
+        status: 204,
+        headers: {
+            "Access-Control-Allow-Origin": origin,
+            "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+        },
+    });
+}
