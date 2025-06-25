@@ -12,9 +12,7 @@ export async function GET(
     res: NextResponse
 ) {
     try {
-
         const origin = req.headers.get("origin") || "*";
-
         await connectToDb();
 
         const { username, mockRoute } = context.params;
@@ -26,12 +24,19 @@ export async function GET(
         const page = searchParams.get('page');
         const limit = searchParams.get('limit');
 
+        let finalResponse: any = null;
+
         const user = await User.findOne({ username });
         if (!user) {
-            return NextResponse.json(
+            finalResponse = NextResponse.json(
                 { success: false, data: null, message: "User not found" },
-                { status: 404 }
+                { status: 404, headers: {
+                    "Access-Control-Allow-Origin": origin,
+                    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type",
+                } }
             );
+            return finalResponse;
         }
 
         const mock = await Mock.findOne({
@@ -39,18 +44,28 @@ export async function GET(
             route: mockRoute,
         });
         if (!mock) {
-            return NextResponse.json(
+            finalResponse = NextResponse.json(
                 { success: false, data: null, message: "Mock not found" },
-                { status: 404 }
+                { status: 404, headers: {
+                    "Access-Control-Allow-Origin": origin,
+                    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type",
+                } }
             );
+            return finalResponse;
         }
 
         // Handle simulated error
         if (simulateError) {
-            return NextResponse.json(
+            finalResponse =  NextResponse.json(
                 { success: false, data: null, message: 'Simulated error response' },
-                { status: 500 }
+                { status: 500, headers: {
+                    "Access-Control-Allow-Origin": origin,
+                    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type",
+                } }
             );
+            return finalResponse;
         }
 
         // Apply custom delay if provided
@@ -62,29 +77,44 @@ export async function GET(
         }
 
         let response = mock.response;
-        let finalResponse: any = null;
-
 
         // Handle filtering by keyField if response is array
-        if (mock.isArray && Array.isArray(response) && mock.keyField) {
-            const filterValue = searchParams.get(mock.keyField) || searchParams.get('id');
+        if (!finalResponse && mock.isArray && Array.isArray(response) && mock.keyField) {
+            const filterValue = searchParams.get('id') || searchParams.get(mock.keyField);
             if (filterValue) {
                 response = response.filter((item: any) =>
                     String(item[mock.keyField]) === filterValue
                 );
 
+                if (response.length === 0) {
+                    finalResponse = NextResponse.json(
+                        { success: false, data: null, message: "No item found with the specified filter" },
+                        { status: 404, headers: {
+                            "Access-Control-Allow-Origin": origin,
+                            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                            "Access-Control-Allow-Headers": "Content-Type",
+                        } }
+                    );
+                    return finalResponse;
+                }
+
                 // Return single object if only one result
                 if (response.length === 1) {
                     finalResponse = NextResponse.json(
                         { success: true, data: response[0], message: "Fetched successfully" },
-                        { status: mock.status || 200 }
+                        { status: mock.status || 200, headers: {
+                            "Access-Control-Allow-Origin": origin,
+                            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                            "Access-Control-Allow-Headers": "Content-Type",
+                        } }
                     );
+                    return finalResponse;
                 }
             }
         }
 
         // Handle pagination if response is array
-        if (mock.isArray && Array.isArray(response) && (page || limit)) {
+        if (!finalResponse && mock.isArray && Array.isArray(response) && (page || limit)) {
             const pageNum = parseInt(page || '1', 10);
             const limitNum = parseInt(limit || '10', 10);
             const startIndex = (pageNum - 1) * limitNum;
@@ -103,32 +133,41 @@ export async function GET(
                     },
                     message: "Fetched successfully"
                 };
-                finalResponse = NextResponse.json(paginatedResponse, { status: mock.status || 200 });
+                finalResponse = NextResponse.json(paginatedResponse, { status: mock.status || 200, headers: {
+                    "Access-Control-Allow-Origin": origin,
+                    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type",
+                } });
+                return finalResponse;
             } else {
                 response = response.slice(startIndex, endIndex);
             }
         }
 
+        // Default response if not set above
         if (!finalResponse) {
             finalResponse = NextResponse.json(
                 { success: true, data: response, message: "Fetched successfully" },
-                { status: mock.status || 200 }
+                { status: mock.status || 200, headers: {
+                    "Access-Control-Allow-Origin": origin,
+                    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type",
+                } }
             );
         }
-
-        finalResponse.headers.set("Access-Control-Allow-Origin", origin);
-        finalResponse.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        finalResponse.headers.set("Access-Control-Allow-Headers", "Content-Type");
 
         return finalResponse;
     } catch (error: any) {
         console.error("Error in GET /api/mocks/[username]/[mockRoute]:", error);
         return NextResponse.json(
             { success: false, data: null, message: "Internal server error" },
-            { status: 500 }
+            { status: 500, headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type",
+            } }
         );
     }
-
 }
 
 export async function PUT(
