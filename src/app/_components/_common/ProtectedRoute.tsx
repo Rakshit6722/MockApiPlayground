@@ -7,10 +7,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
     const [isChecking, setIsChecking] = useState(true)
 
+    const isLoggedIn = localStorage.getItem('mockFlow-token');
 
     useEffect(() => {
 
-        const isLoggedIn = localStorage.getItem('mockFlow-token');
 
         if (!isLoggedIn) {
             router.push('/auth/login');
@@ -28,7 +28,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
         );
     }
 
-    return <>{children}</>;
+    return isLoggedIn ? children : router.push('/auth/login');
 }
 
 export default ProtectedRoute
