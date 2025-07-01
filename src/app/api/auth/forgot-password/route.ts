@@ -25,7 +25,6 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    console.log("Received email for password reset:", email);
 
     const user = await User.findOne({
       email: email
@@ -115,7 +114,7 @@ export async function POST(req: NextRequest) {
             </html>`
       })
     } catch (err) {
-      console.log("nodemailer error", err)
+      throw new Error(`Error with nodemailer ${err}`)
     }
 
 
