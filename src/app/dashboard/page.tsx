@@ -218,7 +218,7 @@ function DashboardPage() {
       setLogoutLoading(true);
       const data = await logout();
       if (data?.message === 'Logout successful') {
-        localStorage.removeItem('token');
+        localStorage.removeItem('mockFlow-token');
         dispatch(logoutUser());
         await persistor.purge();
         router.push('/');

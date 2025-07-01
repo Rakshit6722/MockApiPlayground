@@ -2,22 +2,18 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-
     const router = useRouter()
-
     const [isChecking, setIsChecking] = useState(true)
-
-    const isLoggedIn = localStorage.getItem('mockFlow-token');
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
 
     useEffect(() => {
-
-
-        if (!isLoggedIn) {
+        const token = localStorage.getItem('mockFlow-token');
+        if (!token) {
             router.push('/auth/login');
         } else {
+            setIsLoggedIn(true);
             setIsChecking(false);
         }
-
     }, [router])
 
     if (isChecking) {
@@ -28,7 +24,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
         );
     }
 
-    return isLoggedIn ? children : router.push('/auth/login');
+    return isLoggedIn ? children : null;
 }
 
 export default ProtectedRoute

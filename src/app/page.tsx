@@ -1,7 +1,7 @@
 "use client";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import Link from "next/link";
-import { useRef } from "react";
+import { JSX, useRef } from "react";
 import { ArrowRight, Code, Plus, Zap, Star, ChevronRight, Users, Clock4, GitMerge, FileCode2, Check, X } from "lucide-react";
 import Footer from "./_components/_common/Footer";
 import Navbar from "./_components/_common/Navbar";
