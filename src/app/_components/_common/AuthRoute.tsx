@@ -1,7 +1,7 @@
 import React from 'react'
 
 function AuthRoute({ children }: { children: React.ReactNode }) {
-    const isLoggedIn = typeof window !== 'undefined' && localStorage.getItem('token') !== null;
+    const isLoggedIn = typeof window !== 'undefined' && localStorage.getItem('mockFlow-token') !== null;
 
     if (isLoggedIn) {
         window.location.href = '/dashboard';
