@@ -43,7 +43,7 @@ export default function LoginPage() {
         email: result.email,
         token: result.token,
       }));
-      localStorage.setItem('token', result.token);
+      localStorage.setItem('mockFlow-token', result.token);
       dispatch(setIsLoggedIn(true));
       router.push('/dashboard');
     } catch (error: any) {

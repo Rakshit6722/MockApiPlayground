@@ -6,7 +6,7 @@ const apiInstance: any = axios.create({})
 apiInstance.interceptors.request.use(
     (config: any) => {
         if (config.requireAuth) {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('mockFlow-token');
             if (token) {
                 config.headers['Authorization'] = `Bearer ${token}`;
             } else {

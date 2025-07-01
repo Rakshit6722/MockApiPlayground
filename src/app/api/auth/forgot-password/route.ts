@@ -50,11 +50,12 @@ export async function POST(req: NextRequest) {
 
     const resetLink = `${process.env.PUBLIC_APP_URL}/auth/reset-password?token=${resetToken}&email=${email}`;
 
-    await sendEmail({
-      to: user.email,
-      subject: "Password Reset Request",
-      text: `You requested a password reset. Click the link below to reset your password:\n\n${resetLink}\n\nIf you did not request this, please ignore this email.`,
-      html: `<!DOCTYPE html>
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: "Password Reset Request",
+        text: `You requested a password reset. Click the link below to reset your password:\n\n${resetLink}\n\nIf you did not request this, please ignore this email.`,
+        html: `<!DOCTYPE html>
             <html>
             <head>
               <meta charset="utf-8">
@@ -112,7 +113,11 @@ export async function POST(req: NextRequest) {
               </table>
             </body>
             </html>`
-    })
+      })
+    } catch (err) {
+      console.log("nodemailer error", err)
+    }
+
 
     return NextResponse.json(
       { message: "Password reset link sent to your email" },
