@@ -256,10 +256,10 @@ function Form({
             setGenerationError('Please specify what type of data to generate');
             return;
         }
-        
+
         setGeneratingData(true);
         setGenerationError('');
-        
+
         try {
             // Ensure 'id' is always included in keyFields
             let fields = keyFields
@@ -276,9 +276,9 @@ function Form({
 Always respond with properly formatted JSON only - no explanations, comments, or markdown formatting.`;
 
             // Build the prompt
-            const userPrompt = `Generate a JSON ${isArray ? 'array' : 'object'} of ${dataLength} ${dataType} items.${
-                fields.length > 0 ? ` Each item should include these fields: ${fields.join(', ')}.` : ''
-            } Make the data realistic and varied. Format as valid JSON without any explanations or text - I need pure JSON only.`;
+            const userPrompt = `Generate a JSON ${isArray ? 'array' : 'object'} of ${dataLength} ${dataType} items. ${
+                fields.length > 0 ? `Each item should include these fields: ${fields.join(', ')}.` : ''
+            } Ensure that all image fields (e.g., "image" or "image_url") contain placeholder URLs. Format as valid JSON without any explanations or text - I need pure JSON only.`;
             
             console.log("api key", process.env.NEXT_PUBLIC_GROK_API_KEY);
 
@@ -286,7 +286,7 @@ Always respond with properly formatted JSON only - no explanations, comments, or
             const response = await axios.post(
                 'https://api.groq.com/openai/v1/chat/completions',
                 {
-                    model: "meta-llama/llama-4-scout-17b-16e-instruct",
+                    model: "meta-llama/llama-4-maverick-17b-128e-instruct",
                     messages: [
                         { role: "system", content: systemMessage },
                         { role: "user", content: userPrompt }
@@ -328,30 +328,54 @@ Always respond with properly formatted JSON only - no explanations, comments, or
                     }
                     
                     // Parse the JSON
-                    let parsedJSON;
-                    try {
-                        parsedJSON = JSON.parse(cleanedResponse);
-                        console.log('Successfully parsed JSON');
-                    } catch (initialParseError) {
-                        // If parsing fails, try to repair common issues
-                        console.log('Initial parsing failed, attempting to repair JSON');
-                        
-                        // Try to extract JSON from text
-                        const jsonRegex = /(\{|\[)[\s\S]*(\}|\])/;
-                        const match = cleanedResponse.match(jsonRegex);
-                        
-                        if (match) {
-                            try {
-                                parsedJSON = JSON.parse(match[0]);
-                                console.log('Extracted and parsed JSON successfully');
-                            } catch (extractError) {
-                                throw new Error('Failed to parse extracted JSON');
+                    let parsedJSON = JSON.parse(cleanedResponse);
+
+                    // Fetch Unsplash images
+                    const fetchUnsplashImages = async (query: string, count: number) => {
+                        const accessKey = process.env.NEXT_UNPSPLASH_ACCESS_KEY; // Replace with your Unsplash API key
+                        console.log("Access key",accessKey)
+                        const url = `https://api.unsplash.com/search/photos?query=${query}&per_page=${count}`;
+
+                        try {
+                            const response = await axios.get(url, {
+                                headers: {
+                                    Authorization: `Client-ID ${process.env.NEXT_PUBLIC_UNPSPLASH_ACCESS_KEY}`
                             }
-                        } else {
-                            throw new Error('Could not find valid JSON in response');
+                        });
+                        return response.data.results.map((img: any) => img.urls.small); // Use the small image URL
+                        } catch (error) {
+                            console.error("Error fetching images from Unsplash:", error);
+                            return [];
                         }
-                    }
-                    
+                    };
+
+                    const unsplashImages = await fetchUnsplashImages(dataType, dataLength);
+
+                    // Replace placeholder image URLs with Unsplash URLs
+                    const replaceImageUrls = (data: any) => {
+                        let imageIndex = 0;
+
+                        const assignUnsplashUrls = (obj: any): any => {
+                            if (Array.isArray(obj)) {
+                                return obj.map(assignUnsplashUrls);
+                            } else if (typeof obj === "object" && obj !== null) {
+                                for (const key in obj) {
+                                    if (key.toLowerCase().includes("image")) {
+                                        obj[key] = unsplashImages[imageIndex % unsplashImages.length];
+                                        imageIndex++;
+                                    } else {
+                                        obj[key] = assignUnsplashUrls(obj[key]);
+                                    }
+                                }
+                            }
+                            return obj;
+                        };
+
+                        return assignUnsplashUrls(data);
+                    };
+
+                    parsedJSON = replaceImageUrls(parsedJSON);
+
                     // Update form with parsed JSON
                     setResponseBody(JSON.stringify(parsedJSON, null, 2));
                     setJsonError('');
@@ -366,7 +390,7 @@ Always respond with properly formatted JSON only - no explanations, comments, or
                 } catch (parseError) {
                     console.error('Error parsing AI generated response:', parseError);
                     console.log('Raw response that failed to parse:', jsonContent);
-                    
+
                     // More specific error message
                     setGenerationError(
                         'The AI generated invalid JSON. Try with fewer items or simpler data structure.'
