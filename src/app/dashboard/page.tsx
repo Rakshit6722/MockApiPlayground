@@ -836,25 +836,6 @@ function DashboardPage() {
                         />
                       </div>
                       
-                      {/* Empty state */}
-                      {userMocks.length === 0 && !isLoading && (
-                        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 md:p-8 text-center mt-6">
-                          <div className="inline-flex items-center justify-center p-3 bg-blue-900/20 text-blue-400 rounded-full mb-4">
-                            <Database size={24} />
-                          </div>
-                          <h3 className="text-xl font-semibold text-white mb-2">No API Endpoints Yet</h3>
-                          <p className="text-gray-400 max-w-md mx-auto mb-6">
-                            Create your first API endpoint to get started with mocking data for your applications.
-                          </p>
-                          <button
-                            onClick={openCreateModal}
-                            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2 mx-auto cursor-pointer"
-                          >
-                            <Plus size={18} />
-                            <span>Create Your First Endpoint</span>
-                          </button>
-                        </div>
-                      )}
                     </>
                   )}
                 </motion.div>
