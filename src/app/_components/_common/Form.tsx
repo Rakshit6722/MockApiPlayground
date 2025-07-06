@@ -276,9 +276,9 @@ function Form({
 Always respond with properly formatted JSON only - no explanations, comments, or markdown formatting.`;
 
             // Build the prompt
-            const userPrompt = `Generate a JSON ${isArray ? 'array' : 'object'} of ${dataLength} ${dataType} items. ${
+            const userPrompt = `Generate a JSON array of ${dataLength} ${dataType} items. ${
                 fields.length > 0 ? `Each item should include these fields: ${fields.join(', ')}.` : ''
-            } Ensure that all image fields (e.g., "image" or "image_url") contain placeholder URLs. Format as valid JSON without any explanations or text - I need pure JSON only.`;
+            } Ensure that all image fields (e.g., "image" or "image_url") contain placeholder URLs. Format as valid JSON without any explanations or text - I need a pure JSON array only.`;
             
             console.log("api key", process.env.NEXT_PUBLIC_GROK_API_KEY);
 
